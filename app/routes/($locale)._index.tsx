@@ -1,29 +1,31 @@
-import {Suspense} from 'react';
-import {Await} from 'react-router';
-import {HeroSection} from '~/components/HeroSection';
-import type {Route} from './+types/($locale)._index';
+import { Suspense } from 'react';
+import { Await } from 'react-router';
+import { HeroSection } from '~/components/HeroSection';
+import type { Route } from './+types/($locale)._index';
 
 export const meta: Route.MetaFunction = () => {
-  return [{title: 'PriyoGhosh | Fashion Store'}];
+  return [{ title: 'PriyoGhosh | Fashion Store' }];
 };
 
 export async function loader(args: Route.LoaderArgs) {
   const deferredData = loadDeferredData(args);
   const criticalData = await loadCriticalData(args);
-  return {...deferredData, ...criticalData};
+  return { ...deferredData, ...criticalData };
 }
 
-async function loadCriticalData({context}: Route.LoaderArgs) {
-  const [{collections}] = await Promise.all([
+async function loadCriticalData({ context }: Route.LoaderArgs) {
+  const [{ collections }, { metaobject }] = await Promise.all([
     context.storefront.query(FEATURED_COLLECTION_QUERY),
+    context.storefront.query(HERO_BANNER_QUERY),
   ]);
 
   return {
     featuredCollection: collections.nodes[0],
+    heroBanner: metaobject,
   };
 }
 
-function loadDeferredData({context}: Route.LoaderArgs) {
+function loadDeferredData({ context }: Route.LoaderArgs) {
   const recommendedProducts = context.storefront
     .query(RECOMMENDED_PRODUCTS_QUERY)
     .catch((error: Error) => {
@@ -41,12 +43,12 @@ export default function Homepage({
 }: {
   loaderData: Awaited<ReturnType<typeof loader>>;
 }) {
-  const {recommendedProducts} = loaderData;
+  const { recommendedProducts, heroBanner } = loaderData;
 
   return (
     <div>
       {/* Hero Section */}
-      <HeroSection />
+      <HeroSection heroBanner={heroBanner} />
 
       {/* ✅ Simple Test - Without FeaturedProducts component */}
       <section className="py-20 px-4 max-w-7xl mx-auto">
@@ -58,7 +60,7 @@ export default function Homepage({
           <Await resolve={recommendedProducts}>
             {(response) => {
               const products = response?.products?.nodes || [];
-              
+
               console.log('Total products:', products.length);
               console.log('First product:', products[0]?.title);
 
@@ -69,8 +71,8 @@ export default function Homepage({
               return (
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                   {products.map((product: any) => (
-                    <div 
-                      key={product.id} 
+                    <div
+                      key={product.id}
                       className="border border-gray-200 p-4 text-center"
                     >
                       {/* Simple Image */}
@@ -180,6 +182,16 @@ const RECOMMENDED_PRODUCTS_QUERY = `#graphql
     products(first: 8, sortKey: UPDATED_AT, reverse: true) {
       nodes {
         ...RecommendedProduct
+      }
+    }
+  }
+` as const;
+
+const HERO_BANNER_QUERY = `#graphql
+  query HeroBanner {
+    metaobject(handle: {handle: "never-hunt-alone", type: "hero"}) {
+      field(key: "hero_media") {
+        value
       }
     }
   }
