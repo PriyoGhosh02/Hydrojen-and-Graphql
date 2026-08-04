@@ -1,54 +1,32 @@
-import {Await, useLoaderData, Link} from 'react-router';
-import type {Route} from './+types/_index';
 import {Suspense} from 'react';
-import {Image} from '@shopify/hydrogen';
-import type {
-  FeaturedCollectionFragment,
-  RecommendedProductsQuery,
-} from 'storefrontapi.generated';
-import {ProductItem} from '~/components/ProductItem';
-import {MockShopNotice} from '~/components/MockShopNotice';
+import {Await} from 'react-router';
+import {HeroSection} from '~/components/HeroSection';
+import type {Route} from './+types/($locale)._index';
 
 export const meta: Route.MetaFunction = () => {
-  return [{title: 'Hydrogen | Home'}];
+  return [{title: 'PriyoGhosh | Fashion Store'}];
 };
 
 export async function loader(args: Route.LoaderArgs) {
-  // Start fetching non-critical data without blocking time to first byte
   const deferredData = loadDeferredData(args);
-
-  // Await the critical data required to render initial state of the page
   const criticalData = await loadCriticalData(args);
-
   return {...deferredData, ...criticalData};
 }
 
-/**
- * Load data necessary for rendering content above the fold. This is the critical data
- * needed to render the page. If it's unavailable, the whole page should 400 or 500 error.
- */
 async function loadCriticalData({context}: Route.LoaderArgs) {
   const [{collections}] = await Promise.all([
     context.storefront.query(FEATURED_COLLECTION_QUERY),
-    // Add other queries here, so that they are loaded in parallel
   ]);
 
   return {
-    isShopLinked: Boolean(context.env.PUBLIC_STORE_DOMAIN),
     featuredCollection: collections.nodes[0],
   };
 }
 
-/**
- * Load data for rendering content below the fold. This data is deferred and will be
- * fetched after the initial page load. If it's unavailable, the page should still 200.
- * Make sure to not throw any errors here, as it will cause the page to 500.
- */
 function loadDeferredData({context}: Route.LoaderArgs) {
   const recommendedProducts = context.storefront
     .query(RECOMMENDED_PRODUCTS_QUERY)
     .catch((error: Error) => {
-      // Log query errors, but don't throw them so the page can still render
       console.error(error);
       return null;
     });
@@ -58,68 +36,93 @@ function loadDeferredData({context}: Route.LoaderArgs) {
   };
 }
 
-export default function Homepage() {
-  const data = useLoaderData<typeof loader>();
+export default function Homepage({
+  loaderData,
+}: {
+  loaderData: Awaited<ReturnType<typeof loader>>;
+}) {
+  const {recommendedProducts} = loaderData;
+
   return (
-    <div className="home">
-      {data.isShopLinked ? null : <MockShopNotice />}
-      <FeaturedCollection collection={data.featuredCollection} />
-      <RecommendedProducts products={data.recommendedProducts} />
+    <div>
+      {/* Hero Section */}
+      <HeroSection />
+
+      {/* ✅ Simple Test - Without FeaturedProducts component */}
+      <section className="py-20 px-4 max-w-7xl mx-auto">
+        <h2 className="text-3xl font-bold text-center mb-10">
+          Featured Products
+        </h2>
+
+        <Suspense fallback={<p className="text-center text-xl">Loading...</p>}>
+          <Await resolve={recommendedProducts}>
+            {(response) => {
+              const products = response?.products?.nodes || [];
+              
+              console.log('Total products:', products.length);
+              console.log('First product:', products[0]?.title);
+
+              if (products.length === 0) {
+                return <p className="text-center text-red-500">No products</p>;
+              }
+
+              return (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                  {products.map((product: any) => (
+                    <div 
+                      key={product.id} 
+                      className="border border-gray-200 p-4 text-center"
+                    >
+                      {/* Simple Image */}
+                      {product.featuredImage && (
+                        <img
+                          src={product.featuredImage.url}
+                          alt={product.title}
+                          className="w-full h-64 object-cover mb-4"
+                        />
+                      )}
+
+                      {/* Title */}
+                      <h3 className="font-bold text-lg mb-2">
+                        {product.title}
+                      </h3>
+
+                      {/* Price */}
+                      <p className="text-gray-600">
+                        {product.priceRange.minVariantPrice.currencyCode}{' '}
+                        {product.priceRange.minVariantPrice.amount}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              );
+            }}
+          </Await>
+        </Suspense>
+      </section>
     </div>
   );
 }
 
-function FeaturedCollection({
-  collection,
-}: {
-  collection: FeaturedCollectionFragment;
-}) {
-  if (!collection) return null;
-  const image = collection?.image;
+// Loading Skeleton
+function ProductsSkeleton() {
   return (
-    <Link
-      className="featured-collection"
-      to={`/collections/${collection.handle}`}
-    >
-      {image && (
-        <div className="featured-collection-image">
-          <Image
-            data={image}
-            sizes="100vw"
-            alt={image.altText || collection.title}
-          />
-        </div>
-      )}
-      <h1>{collection.title}</h1>
-    </Link>
-  );
-}
-
-function RecommendedProducts({
-  products,
-}: {
-  products: Promise<RecommendedProductsQuery | null>;
-}) {
-  return (
-    <section
-      className="recommended-products"
-      aria-labelledby="recommended-products"
-    >
-      <h2 id="recommended-products">Recommended Products</h2>
-      <Suspense fallback={<div>Loading...</div>}>
-        <Await resolve={products}>
-          {(response) => (
-            <div className="recommended-products-grid">
-              {response
-                ? response.products.nodes.map((product) => (
-                    <ProductItem key={product.id} product={product} />
-                  ))
-                : null}
+    <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <div className="text-center mb-12">
+        <div className="h-4 w-32 bg-gray-200 rounded mx-auto mb-3 animate-pulse"></div>
+        <div className="h-8 w-64 bg-gray-200 rounded mx-auto animate-pulse"></div>
+      </div>
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="animate-pulse">
+            <div className="bg-gray-200 aspect-[3/4] rounded"></div>
+            <div className="mt-4 space-y-2">
+              <div className="h-4 bg-gray-200 rounded w-3/4 mx-auto"></div>
+              <div className="h-4 bg-gray-200 rounded w-1/2 mx-auto"></div>
             </div>
-          )}
-        </Await>
-      </Suspense>
-      <br />
+          </div>
+        ))}
+      </div>
     </section>
   );
 }
@@ -158,6 +161,12 @@ const RECOMMENDED_PRODUCTS_QUERY = `#graphql
         currencyCode
       }
     }
+    compareAtPriceRange {
+      minVariantPrice {
+        amount
+        currencyCode
+      }
+    }
     featuredImage {
       id
       url
@@ -168,7 +177,7 @@ const RECOMMENDED_PRODUCTS_QUERY = `#graphql
   }
   query RecommendedProducts ($country: CountryCode, $language: LanguageCode)
     @inContext(country: $country, language: $language) {
-    products(first: 4, sortKey: UPDATED_AT, reverse: true) {
+    products(first: 8, sortKey: UPDATED_AT, reverse: true) {
       nodes {
         ...RecommendedProduct
       }
