@@ -84,7 +84,7 @@ export function HeroSection({
         ) : (
           <div
             className="w-full h-full bg-gradient-to-br 
-                          from-[#1a1a1a] via-[#2c1d11] to-[#121212]"
+                          from-primary via-[#2c1d11] to-[#121212]"
           />
         )}
       </div>

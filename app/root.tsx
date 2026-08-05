@@ -1,9 +1,11 @@
 import { Analytics, getShopAnalytics } from '@shopify/hydrogen';
 import styles from '~/styles/tailwind.css?url';
+import appStyles from '~/styles/app.css?url';
 import { Suspense } from 'react';
 import { Await } from 'react-router';
 import { Aside } from '~/components/Aside';
 import { CartMain } from '~/components/CartMain';
+import { CartDrawer } from '~/components/CartDrawer';
 
 import {
   isRouteErrorResponse,
@@ -16,7 +18,7 @@ import {
   useRouteLoaderData,
   type ShouldRevalidateFunction,
 } from 'react-router';
-import favicon from '~/assets/favicon.svg';
+import favicon from '~/assets/fav.png';
 import { Header } from '~/components/Header';
 import { FOOTER_QUERY, HEADER_QUERY } from '~/lib/fragments';
 import type { Route } from './+types/root';
@@ -31,8 +33,9 @@ export const shouldRevalidate: ShouldRevalidateFunction = ({
   nextUrl,
 }) => {
   if (formMethod && formMethod !== 'GET') return true;
-  if (currentUrl.toString() === nextUrl.toString()) return true;
-  return false;
+
+  // Only revalidate layout when pathname changes, preventing root flashes on search parameter updates
+  return currentUrl.pathname !== nextUrl.pathname;
 };
 
 export function links() {
@@ -41,6 +44,7 @@ export function links() {
     { rel: 'preconnect', href: 'https://shop.app' },
     { rel: 'icon', type: 'image/svg+xml', href: favicon },
     { rel: 'stylesheet', href: styles },
+    { rel: 'stylesheet', href: appStyles },
   ];
 }
 
@@ -110,7 +114,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Aside.Provider>
           {/* ✅ শুধু আমাদের custom Header */}
           <Header />
-          <CartAside />
+          <CartDrawer />
 
           {/* ✅ Page content এখানে আসবে */}
           <main>{children}</main>
@@ -120,23 +124,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Scripts />
       </body>
     </html>
-  );
-}
-
-function CartAside() {
-  const rootData = useRouteLoaderData<RootLoader>('root');
-  if (!rootData) return null;
-
-  return (
-    <Aside type="cart" heading="CART">
-      <Suspense fallback={<p className="p-6 text-gray-500 text-sm">Loading cart ...</p>}>
-        <Await resolve={rootData.cart}>
-          {(cart) => {
-            return <CartMain cart={cart} layout="aside" />;
-          }}
-        </Await>
-      </Suspense>
-    </Aside>
   );
 }
 

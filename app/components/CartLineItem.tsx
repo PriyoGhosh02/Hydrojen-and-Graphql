@@ -4,7 +4,7 @@ import {CartForm, Image, type OptimisticCartLine} from '@shopify/hydrogen';
 import {useVariantUrl} from '~/lib/variants';
 import {Link} from 'react-router';
 import {ProductPrice} from './ProductPrice';
-import {useAside} from './Aside';
+import {closeCartDrawer} from '~/components/CartDrawer';
 import type {
   CartApiQueryFragment,
   CartLineFragment,
@@ -30,7 +30,6 @@ export function CartLineItem({
   const {id, merchandise} = line;
   const {product, title, image, selectedOptions} = merchandise;
   const lineItemUrl = useVariantUrl(product.handle, selectedOptions);
-  const {close} = useAside();
   const lineItemChildren = childrenMap[id];
   const childrenLabelId = `cart-line-children-${id}`;
 
@@ -55,10 +54,10 @@ export function CartLineItem({
             to={lineItemUrl}
             onClick={() => {
               if (layout === 'aside') {
-                close();
+                closeCartDrawer();
               }
             }}
-            className="text-xs font-semibold text-gray-900 tracking-wide uppercase hover:text-[#c9a96e] transition-colors line-clamp-1"
+            className="text-xs font-semibold text-gray-900 tracking-wide uppercase hover:text-accent transition-colors line-clamp-1"
           >
             {product.title}
           </Link>

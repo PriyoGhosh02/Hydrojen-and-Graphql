@@ -1,7 +1,7 @@
 import {useOptimisticCart} from '@shopify/hydrogen';
 import {Link} from 'react-router';
 import type {CartApiQueryFragment} from 'storefrontapi.generated';
-import {useAside} from '~/components/Aside';
+import {closeCartDrawer} from '~/components/CartDrawer';
 import {CartLineItem, type CartLine} from '~/components/CartLineItem';
 import {CartSummary} from './CartSummary';
 
@@ -88,7 +88,6 @@ function CartEmpty({
   hidden: boolean;
   layout?: CartMainProps['layout'];
 }) {
-  const {close} = useAside();
   return (
     <div hidden={hidden} className="flex flex-col items-center justify-center py-16 px-4 text-center">
       <svg
@@ -109,8 +108,8 @@ function CartEmpty({
       </p>
       <Link
         to="/collections"
-        onClick={close}
-        className="inline-block bg-[#1a1a1a] hover:bg-[#c9a96e] text-white hover:text-black px-6 py-3 text-xs font-bold tracking-widest uppercase transition-all duration-300 rounded-none cursor-pointer border border-transparent hover:-translate-y-0.5"
+        onClick={() => closeCartDrawer()}
+        className="inline-block bg-primary hover:bg-accent text-white hover:text-black px-6 py-3 text-xs font-bold tracking-widest uppercase transition-all duration-300 rounded-none cursor-pointer border border-transparent hover:-translate-y-0.5"
       >
         Continue shopping
       </Link>

@@ -1,15 +1,20 @@
 import { useState, Suspense } from 'react';
 import { Link, useLocation, useRouteLoaderData, Await } from 'react-router';
 import type { RootLoader } from '~/root';
-import { useAside } from '~/components/Aside';
+import { openCartDrawer } from '~/components/CartDrawer';
 
 // Cart Icon Component
 function CartIcon({ count }: { count: number }) {
-  const { open } = useAside();
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    openCartDrawer();
+  };
+
   return (
-    <button
-      onClick={() => open('cart')}
-      className="relative p-2 hover:opacity-70 transition-opacity cursor-pointer focus:outline-none"
+    <Link
+      to="/cart"
+      onClick={handleClick}
+      className="relative p-2 hover:opacity-70 transition-opacity"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -28,14 +33,14 @@ function CartIcon({ count }: { count: number }) {
 
       {count > 0 && (
         <span
-          className="absolute -top-1 -right-1 bg-[#c9a96e] text-white 
+          className="absolute -top-1 -right-1 bg-accent text-white 
                          text-xs w-5 h-5 rounded-full flex items-center 
                          justify-center font-medium"
         >
           {count}
         </span>
       )}
-    </button>
+    </Link>
   );
 }
 
@@ -82,12 +87,12 @@ export function Header({ cartCount = 0 }: { cartCount?: number }) {
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
       <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-14">
           {/* Logo */}
           <Link
             to="/"
             className="text-2xl font-bold tracking-widest uppercase 
-                       text-[#1a1a1a] hover:text-[#c9a96e] transition-colors"
+                       text-primary hover:text-accent transition-colors"
           >
             TIMECRAFTS
           </Link>
@@ -103,7 +108,7 @@ export function Header({ cartCount = 0 }: { cartCount?: number }) {
                   <div key={item.id} className="relative group py-2">
                     <button
                       className="flex items-center text-sm font-medium tracking-wide uppercase
-                                 transition-colors hover:text-[#c9a96e] text-gray-600 focus:outline-none cursor-pointer"
+                                 transition-colors hover:text-accent text-gray-600 focus:outline-none cursor-pointer"
                     >
                       <span>{item.title}</span>
                       <svg
@@ -134,7 +139,7 @@ export function Header({ cartCount = 0 }: { cartCount?: number }) {
                               key={child.id}
                               to={childUrl}
                               className="block px-4 py-2 text-xs font-medium uppercase tracking-wider text-gray-600 
-                                         hover:text-[#c9a96e] hover:bg-gray-50 transition-colors"
+                                         hover:text-accent hover:bg-gray-50 transition-colors"
                             >
                               {child.title}
                             </Link>
@@ -151,9 +156,9 @@ export function Header({ cartCount = 0 }: { cartCount?: number }) {
                   key={item.id}
                   to={url}
                   className={`text-sm font-medium tracking-wide uppercase
-                             transition-colors hover:text-[#c9a96e]
+                             transition-colors hover:text-accent
                              ${location.pathname === url
-                      ? 'text-[#c9a96e] border-b-2 border-[#c9a96e] pb-1'
+                      ? 'text-accent border-b-2 border-accent pb-1'
                       : 'text-gray-600'
                     }`}
                 >
@@ -274,8 +279,8 @@ export function Header({ cartCount = 0 }: { cartCount?: number }) {
                                 key={child.id}
                                 to={childUrl}
                                 onClick={() => setIsMenuOpen(false)}
-                                className={`text-xs font-medium tracking-wide uppercase px-2 py-1 transition-colors hover:text-[#c9a96e]
-                                           ${location.pathname === childUrl ? 'text-[#c9a96e]' : 'text-gray-600'}`}
+                                className={`text-xs font-medium tracking-wide uppercase px-2 py-1 transition-colors hover:text-accent
+                                           ${location.pathname === childUrl ? 'text-accent' : 'text-gray-600'}`}
                               >
                                 {child.title}
                               </Link>
@@ -287,8 +292,8 @@ export function Header({ cartCount = 0 }: { cartCount?: number }) {
                       <Link
                         to={url}
                         onClick={() => setIsMenuOpen(false)}
-                        className={`text-sm font-medium tracking-wide uppercase px-2 py-1 transition-colors hover:text-[#c9a96e]
-                                   ${location.pathname === url ? 'text-[#c9a96e]' : 'text-gray-600'}`}
+                        className={`text-sm font-medium tracking-wide uppercase px-2 py-1 transition-colors hover:text-accent
+                                   ${location.pathname === url ? 'text-accent' : 'text-gray-600'}`}
                       >
                         {item.title}
                       </Link>

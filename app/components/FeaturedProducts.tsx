@@ -42,7 +42,7 @@ function ProductCard({ product }: { product: any }) {
                         justify-center pb-6"
         >
           <span
-            className="bg-white text-[#1a1a1a] px-6 py-2 text-xs 
+            className="bg-white text-primary px-6 py-2 text-xs 
                           font-semibold tracking-widest uppercase
                           translate-y-10 opacity-0 
                           group-hover:translate-y-0 group-hover:opacity-100 
@@ -57,8 +57,8 @@ function ProductCard({ product }: { product: any }) {
       <div className="mt-4 text-center">
         {/* Product Title */}
         <h3
-          className="text-sm font-medium text-[#1a1a1a] tracking-wide 
-                       group-hover:text-[#c9a96e] transition-colors 
+          className="text-sm font-medium text-primary tracking-wide 
+                       group-hover:text-accent transition-colors 
                        truncate px-2"
         >
           {product.title}
@@ -66,7 +66,7 @@ function ProductCard({ product }: { product: any }) {
 
         {/* Price */}
         <div className="mt-2">
-          <span className="text-sm font-semibold text-[#1a1a1a]">
+          <span className="text-sm font-semibold text-primary">
             <Money data={product.priceRange.minVariantPrice} />
           </span>
         </div>
@@ -90,15 +90,15 @@ export function FeaturedProducts({ products }: { products: any[] }) {
       {/* Section Header */}
       <div className="text-center mb-12">
         <p
-          className="text-[#c9a96e] text-sm font-medium tracking-[0.3em] 
+          className="text-accent text-sm font-medium tracking-[0.3em] 
                       uppercase mb-3"
         >
           Curated For You
         </p>
-        <h2 className="text-3xl sm:text-4xl font-bold text-[#1a1a1a]">
+        <h2 className="text-3xl sm:text-4xl font-bold text-primary">
           Featured Products
         </h2>
-        <div className="w-20 h-0.5 bg-[#c9a96e] mx-auto mt-4"></div>
+        <div className="w-20 h-0.5 bg-accent mx-auto mt-4"></div>
       </div>
 
       {/* Products Grid */}
@@ -115,9 +115,9 @@ export function FeaturedProducts({ products }: { products: any[] }) {
       <div className="text-center mt-12">
         <Link
           to="/collections/all"
-          className="inline-block border-2 border-[#1a1a1a] text-[#1a1a1a] 
+          className="inline-block border-2 border-primary text-primary 
                      px-10 py-3 text-sm font-semibold tracking-widest 
-                     uppercase hover:bg-[#1a1a1a] hover:text-white 
+                     uppercase hover:bg-primary hover:text-white 
                      transition-all duration-300"
         >
           View All Products

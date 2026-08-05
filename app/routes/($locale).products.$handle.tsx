@@ -1,5 +1,8 @@
-import {redirect, useLoaderData} from 'react-router';
+import {redirect, useLoaderData, Await, type ShouldRevalidateFunction} from 'react-router';
+import {useState, Suspense} from 'react';
 import type {Route} from './+types/products.$handle';
+import {RelatedProducts} from '~/components/RelatedProducts';
+import {BundleSave} from '~/components/BundleSave';
 import {
   getSelectedProductOptions,
   Analytics,
@@ -13,9 +16,18 @@ import {ProductImage} from '~/components/ProductImage';
 import {ProductForm} from '~/components/ProductForm';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 
+export const shouldRevalidate: ShouldRevalidateFunction = ({
+  formMethod,
+  currentUrl,
+  nextUrl,
+}) => {
+  if (formMethod && formMethod !== 'GET') return true;
+  return currentUrl.toString() !== nextUrl.toString();
+};
+
 export const meta: Route.MetaFunction = ({data}) => {
   return [
-    {title: `Hydrogen | ${data?.product.title ?? ''}`},
+    {title: `${data?.product.title ?? ''} | TimeCrafts`},
     {
       rel: 'canonical',
       href: `/products/${data?.product.handle}`,
@@ -24,13 +36,28 @@ export const meta: Route.MetaFunction = ({data}) => {
 };
 
 export async function loader(args: Route.LoaderArgs) {
-  // Start fetching non-critical data without blocking time to first byte
-  const deferredData = loadDeferredData(args);
-
-  // Await the critical data required to render initial state of the page
   const criticalData = await loadCriticalData(args);
 
-  return {...deferredData, ...criticalData};
+  const recommendations = args.context.storefront
+    .query(RECOMMENDATIONS_QUERY, {
+      variables: {productId: criticalData.product.id},
+    })
+    .catch((err) => {
+      console.error('Recommendations error', err);
+      return null;
+    });
+
+  const bundleData = loadBundleCollections(args.context.storefront)
+    .catch((err) => {
+      console.error('Bundle error', err);
+      return null;
+    });
+
+  return {
+    ...criticalData,
+    recommendations,
+    bundleData,
+  };
 }
 
 /**
@@ -48,6 +75,7 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
   const [{product}] = await Promise.all([
     storefront.query(PRODUCT_QUERY, {
       variables: {handle, selectedOptions: getSelectedProductOptions(request)},
+      cache: storefront.CacheNone(),
     }),
     // Add other queries here, so that they are loaded in parallel
   ]);
@@ -77,7 +105,7 @@ function loadDeferredData({context, params}: Route.LoaderArgs) {
 }
 
 export default function Product() {
-  const {product} = useLoaderData<typeof loader>();
+  const {product, recommendations, bundleData} = useLoaderData<typeof loader>();
 
   // Optimistically selects a variant with given available variant information
   const selectedVariant = useOptimisticVariant(
@@ -112,7 +140,7 @@ export default function Product() {
           <div>
             {/* Vendor / Brand */}
             {product.vendor && (
-              <span className="text-[#c9a96e] text-xs font-semibold uppercase tracking-[0.25em] mb-3 block">
+              <span className="text-accent text-xs font-semibold uppercase tracking-[0.25em] mb-3 block">
                 {product.vendor}
               </span>
             )}
@@ -141,18 +169,41 @@ export default function Product() {
 
           <hr className="border-gray-100 my-2" />
 
-          {/* Description Section */}
-          <div className="flex flex-col gap-4">
-            <h3 className="text-sm font-semibold tracking-widest uppercase text-gray-900">
-              Description
-            </h3>
+          {/* Description Section Accordion */}
+          <details className="border-t border-b border-gray-100 py-4 group cursor-pointer select-none">
+            <summary className="w-full flex items-center justify-between text-left focus:outline-none list-none [&::-webkit-details-marker]:hidden bg-transparent border-0 p-0">
+              <h3 className="text-xs font-semibold tracking-widest uppercase text-gray-900 m-0 group-hover:text-accent transition-colors">
+                Description
+              </h3>
+              <span className="text-gray-400 group-hover:text-black transition-colors text-xl font-light group-open:hidden">
+                +
+              </span>
+              <span className="text-gray-400 group-hover:text-black transition-colors text-xl font-light hidden group-open:block">
+                −
+              </span>
+            </summary>
             <div 
-              className="prose prose-sm text-gray-600 leading-relaxed font-light font-sans max-w-none"
+              className="prose prose-sm text-gray-600 leading-relaxed font-light font-sans max-w-none pb-2 mt-4"
               dangerouslySetInnerHTML={{__html: descriptionHtml}} 
             />
-          </div>
+          </details>
+
+          {/* Bundle & Save Section */}
+          <Suspense fallback={<p className="text-gray-400 text-xs py-4 text-center">Loading bundle collections...</p>}>
+            <Await resolve={bundleData}>
+              {(resolvedBundle) => <BundleSave bundleData={resolvedBundle} />}
+            </Await>
+          </Suspense>
+
+          {/* Related Products Section */}
+          <Suspense fallback={<p className="text-gray-400 text-xs py-4 text-center">Loading similar items...</p>}>
+            <Await resolve={recommendations}>
+              {(resolvedRecs) => <RelatedProducts recommendations={resolvedRecs} />}
+            </Await>
+          </Suspense>
         </div>
       </div>
+
       <Analytics.ProductView
         data={{
           products: [
@@ -170,6 +221,127 @@ export default function Product() {
       />
     </div>
   );
+}
+
+const RECOMMENDATIONS_QUERY = `#graphql
+  query ProductRecommendations(
+    $productId: ID!
+    $country: CountryCode
+    $language: LanguageCode
+  ) @inContext(country: $country, language: $language) {
+    productRecommendations(productId: $productId) {
+      id
+      title
+      handle
+      vendor
+      priceRange {
+        minVariantPrice {
+          amount
+          currencyCode
+        }
+      }
+      featuredImage {
+        url
+        altText
+        width
+        height
+      }
+    }
+  }
+` as const;
+
+async function loadBundleCollections(storefront: any) {
+  const query = `#graphql
+    query BundleCollections($country: CountryCode, $language: LanguageCode)
+    @inContext(country: $country, language: $language) {
+      watchCollection: collection(handle: "watch-1") {
+        products(first: 12) {
+          nodes {
+            id
+            title
+            handle
+            featuredImage {
+              url
+              altText
+              width
+              height
+            }
+            options {
+              name
+              optionValues {
+                name
+              }
+            }
+            variants(first: 100) {
+              nodes {
+                id
+                title
+                availableForSale
+                price {
+                  amount
+                  currencyCode
+                }
+                selectedOptions {
+                  name
+                  value
+                }
+                image {
+                  url
+                  altText
+                  width
+                  height
+                }
+              }
+            }
+          }
+        }
+      }
+      braceletCollection: collection(handle: "bracelet-1") {
+        products(first: 12) {
+          nodes {
+            id
+            title
+            handle
+            featuredImage {
+              url
+              altText
+              width
+              height
+            }
+            options {
+              name
+              optionValues {
+                name
+              }
+            }
+            variants(first: 100) {
+              nodes {
+                id
+                title
+                availableForSale
+                price {
+                  amount
+                  currencyCode
+                }
+                selectedOptions {
+                  name
+                  value
+                }
+                image {
+                  url
+                  altText
+                  width
+                  height
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  `;
+  
+  return storefront.query(query);
 }
 
 const PRODUCT_VARIANT_FRAGMENT = `#graphql

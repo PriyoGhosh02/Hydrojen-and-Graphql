@@ -6,7 +6,7 @@
 
 - Add an explicit `~` app alias to new Hydrogen projects. ([#3852](https://github.com/Shopify/hydrogen/pull/3852)) by [@andguy95](https://github.com/andguy95)
 
-  JavaScript projects use `jsconfig.json`, which is not reliably covered by Vite's native `resolve.tsconfigPaths` behavior. New projects now define Hydrogen's `~/` import convention directly in the Vite config so imports like `~/assets/favicon.svg` work in both TypeScript and JavaScript projects.
+  JavaScript projects use `jsconfig.json`, which is not reliably covered by Vite's native `resolve.tsconfigPaths` behavior. New projects now define Hydrogen's `~/` import convention directly in the Vite config so imports like `~/assets/fav.png` work in both TypeScript and JavaScript projects.
 
 ## 2026.4.4
 

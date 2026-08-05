@@ -1,0 +1,12 @@
+- [x] Create `app/components/CartDrawer.tsx` with self-contained Tailwind slide-over and custom event trigger logic
+- [x] Render `<CartDrawer />` in root layout in `app/root.tsx`
+- [x] Connect Cart Icon in `Header.tsx` to dispatch `open-cart` event
+- [x] Connect `AddToCartButton.tsx` to dispatch `open-cart` event on fetcher completion
+- [x] Update `CartMain.tsx` and `CartLineItem.tsx` to call `closeCartDrawer` when closing or navigating
+- [x] Remove the generic "Hydrogen | " prefix from metadata titles in all route components (cart, search, products, collections, pages, policies, blogs, articles)
+- [x] Free port 3000 by killing the dangling process and restarted dev server on port 3000
+- [x] Replace all hardcoded `#c9a96e` (accent gold) instances with `accent` color variables
+- [x] Replace all hardcoded `#1a1a1a` (primary black) instances with `primary` color variables
+- [x] Correct the inverted root `shouldRevalidate` function logic inside `root.tsx` to allow loaders to trigger on URL change/variant navigation.
+- [x] Update ProductForm.tsx AddToCartButton trigger to call custom openCartDrawer event handler
+- [x] Verify build and local dev server compilation

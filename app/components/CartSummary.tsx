@@ -52,7 +52,7 @@ function CartCheckoutActions({checkoutUrl}: {checkoutUrl?: string}) {
       <a 
         href={checkoutUrl} 
         target="_self"
-        className="w-full text-center block bg-[#1a1a1a] hover:bg-[#c9a96e] text-white hover:text-black py-4 px-6 text-xs font-bold tracking-widest uppercase transition-all duration-300 rounded-none shadow-md cursor-pointer border border-transparent hover:-translate-y-0.5"
+        className="w-full text-center block bg-primary hover:bg-accent text-white hover:text-black py-4 px-6 text-xs font-bold tracking-widest uppercase transition-all duration-300 rounded-none shadow-md cursor-pointer border border-transparent hover:-translate-y-0.5"
       >
         Continue to Checkout
       </a>

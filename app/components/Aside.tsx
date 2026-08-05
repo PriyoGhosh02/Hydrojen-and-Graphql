@@ -5,7 +5,7 @@ import {
   useEffect,
   useState,
 } from 'react';
-import {useId} from 'react';
+import { useId } from 'react';
 
 type AsideType = 'search' | 'cart' | 'mobile' | 'closed';
 type AsideContextValue = {
@@ -33,7 +33,7 @@ export function Aside({
   type: AsideType;
   heading: React.ReactNode;
 }) {
-  const {type: activeType, close} = useAside();
+  const { type: activeType, close } = useAside();
   const expanded = type === activeType;
   const id = useId();
   useEffect(() => {
@@ -47,7 +47,7 @@ export function Aside({
             close();
           }
         },
-        {signal: abortController.signal},
+        { signal: abortController.signal },
       );
     }
     return () => abortController.abort();
@@ -66,9 +66,9 @@ export function Aside({
           <h3 id={id} className="text-sm font-bold uppercase tracking-widest text-gray-900 m-0">
             {heading}
           </h3>
-          <button 
-            className="text-gray-400 hover:text-black transition-colors text-2xl focus:outline-none cursor-pointer pb-1" 
-            onClick={close} 
+          <button
+            className="text-gray-400 hover:text-black transition-colors text-2xl focus:outline-none cursor-pointer pb-1"
+            onClick={close}
             aria-label="Close"
           >
             &times;
@@ -82,7 +82,7 @@ export function Aside({
 
 const AsideContext = createContext<AsideContextValue | null>(null);
 
-Aside.Provider = function AsideProvider({children}: {children: ReactNode}) {
+Aside.Provider = function AsideProvider({ children }: { children: ReactNode }) {
   const [type, setType] = useState<AsideType>('closed');
 
   return (
