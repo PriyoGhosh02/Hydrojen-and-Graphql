@@ -1,8 +1,8 @@
-import {Image, Money} from '@shopify/hydrogen';
-import {Link} from 'react-router';
+import { Image, Money } from '@shopify/hydrogen';
+import { Link } from 'react-router';
 
 // Product Card Component
-function ProductCard({product}: {product: any}) {
+function ProductCard({ product }: { product: any }) {
   return (
     <Link to={`/products/${product.handle}`} className="group block">
       {/* Product Image */}
@@ -76,7 +76,7 @@ function ProductCard({product}: {product: any}) {
 }
 
 // Main Featured Products Component
-export function FeaturedProducts({products}: {products: any[]}) {
+export function FeaturedProducts({ products }: { products: any[] }) {
   if (!products || products.length === 0) {
     return (
       <section className="py-20 px-4 text-center">
@@ -86,7 +86,7 @@ export function FeaturedProducts({products}: {products: any[]}) {
   }
 
   return (
-    <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-8xl mx-auto">
       {/* Section Header */}
       <div className="text-center mb-12">
         <p

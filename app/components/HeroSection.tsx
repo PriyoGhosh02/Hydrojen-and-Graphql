@@ -8,7 +8,16 @@ export function HeroSection({
   collection?: any;
   heroBanner?: any;
 }) {
-  const heroMediaUrl = heroBanner?.field?.value;
+  // Extract media URL from value or reference
+  let heroMediaUrl = heroBanner?.hero_media?.value;
+  if (heroBanner?.hero_media?.reference) {
+    const ref = heroBanner.hero_media.reference;
+    if (ref.__typename === 'MediaImage') {
+      heroMediaUrl = ref.image?.url || heroMediaUrl;
+    } else if (ref.__typename === 'Video') {
+      heroMediaUrl = ref.sources?.[0]?.url || heroMediaUrl;
+    }
+  }
 
   const isVideo = (url?: string) => {
     if (!url) return false;
@@ -24,8 +33,29 @@ export function HeroSection({
 
   const hasVideo = isVideo(heroMediaUrl);
 
+  const title = heroBanner?.title?.value || 'NEVER HUNT ALONE';
+  const desc = heroBanner?.desc?.value || 'Explore our latest collection of premium fashion. Designed for those who dare to stand out.';
+
+  // Extract button text and link target
+  let btnUrl = collection
+    ? `/collections/${collection.handle}`
+    : '/collections';
+
+
+  if (heroBanner?.btn?.value) {
+    const val = heroBanner.btn.value;
+    if (val.startsWith('/') || val.startsWith('http://') || val.startsWith('https://')) {
+      btnUrl = val;
+    }
+  }
+
+  // Split title to format the last word in gold
+  const titleWords = title.split(' ');
+  const lastWord = titleWords.length > 1 ? titleWords.pop() : '';
+  const mainTitlePart = titleWords.join(' ');
+
   return (
-    <section className="relative w-full h-[90vh] bg-[#121212] overflow-hidden flex items-center">
+    <section className="relative w-full h-[95vh] bg-[#121212] overflow-hidden flex items-center">
       {/* Background Media */}
       <div className="absolute inset-0 z-0">
         {heroMediaUrl ? (
@@ -59,19 +89,11 @@ export function HeroSection({
         )}
       </div>
 
-      {/* Cinematic Gradient Overlays */}
-      <div
-        className="absolute inset-0 bg-gradient-to-t 
-                       from-[#0e0e0e] via-[#0e0e0e]/40 to-[#0e0e0e]/10 z-[1]"
-      />
-      <div
-        className="absolute inset-0 bg-gradient-to-r 
-                       from-[#0e0e0e]/90 via-[#0e0e0e]/30 to-transparent z-[1]"
-      />
+
 
       {/* Content */}
       <div
-        className="relative z-10 max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 
+        className="relative z-10 max-w-8xl mx-auto px-6 sm:px-8 lg:px-12 
                        w-full h-full flex items-center"
       >
         <div className="max-w-2xl text-left">
@@ -80,7 +102,7 @@ export function HeroSection({
             className="text-[#d4af37] text-xs sm:text-sm font-semibold tracking-[0.4em] 
                         uppercase mb-5 animate-fade-in-up"
           >
-            {collection?.title || 'Never Hunt Alone'}
+            {collection?.title || (title !== 'NEVER HUNT ALONE' ? 'Never Hunt Alone' : 'Premium Brand')}
           </p>
 
           {/* Main Title with elegant styling */}
@@ -89,11 +111,13 @@ export function HeroSection({
                          font-extrabold leading-none tracking-tight mb-8 font-sans animate-fade-in-up"
             style={{ animationDelay: '100ms' }}
           >
-            Discover
-            <br />
-            Your
-            <br />
-            <span className="text-[#d4af37] drop-shadow-lg">Style</span>
+            {mainTitlePart}
+            {lastWord && (
+              <>
+                <br />
+                <span className="text-[#d4af37] drop-shadow-lg">{lastWord}</span>
+              </>
+            )}
           </h1>
 
           {/* Description */}
@@ -101,8 +125,7 @@ export function HeroSection({
             className="text-gray-300 text-base sm:text-lg mb-10 max-w-lg leading-relaxed font-light animate-fade-in-up"
             style={{ animationDelay: '200ms' }}
           >
-            Explore our latest collection of premium fashion. Designed for those
-            who dare to stand out.
+            {desc}
           </p>
 
           {/* Buttons */}
@@ -111,17 +134,13 @@ export function HeroSection({
             style={{ animationDelay: '300ms' }}
           >
             <Link
-              to={
-                collection
-                  ? `/collections/${collection.handle}`
-                  : '/collections'
-              }
+              to={btnUrl}
               className="relative overflow-hidden group bg-[#d4af37] text-black px-10 py-4 text-xs sm:text-sm 
                          font-bold tracking-widest uppercase transition-all duration-300 rounded-none
                          shadow-[0_4px_20px_rgba(212,175,55,0.25)] hover:shadow-[0_6px_30px_rgba(212,175,55,0.4)]
                          hover:-translate-y-0.5"
             >
-              <span className="relative z-10">Shop Now</span>
+              <span className="relative z-10">Shop Watches</span>
               <span className="absolute inset-0 w-full h-full bg-white scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300 ease-out -z-1 opacity-10"></span>
             </Link>
 

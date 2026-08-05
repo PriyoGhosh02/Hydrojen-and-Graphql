@@ -1,12 +1,15 @@
-import {useState} from 'react';
-import {Link, useLocation} from 'react-router';
+import { useState, Suspense } from 'react';
+import { Link, useLocation, useRouteLoaderData, Await } from 'react-router';
+import type { RootLoader } from '~/root';
+import { useAside } from '~/components/Aside';
 
 // Cart Icon Component
-function CartIcon({count}: {count: number}) {
+function CartIcon({ count }: { count: number }) {
+  const { open } = useAside();
   return (
-    <Link
-      to="/cart"
-      className="relative p-2 hover:opacity-70 transition-opacity"
+    <button
+      onClick={() => open('cart')}
+      className="relative p-2 hover:opacity-70 transition-opacity cursor-pointer focus:outline-none"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -32,27 +35,53 @@ function CartIcon({count}: {count: number}) {
           {count}
         </span>
       )}
-    </Link>
+    </button>
   );
 }
 
 // Navigation Links
 const NAV_LINKS = [
-  {name: 'Home', path: '/'},
-  {name: 'Collections', path: '/collections'},
-  {name: 'New Arrivals', path: '/collections/new-arrivals'},
-  {name: 'Sale', path: '/collections/sale'},
-  {name: 'About', path: '/pages/about'},
+  { name: 'Home', path: '/' },
+  { name: 'Collections', path: '/collections' },
+  { name: 'New Arrivals', path: '/collections/new-arrivals' },
+  { name: 'Sale', path: '/collections/sale' },
+  { name: 'About', path: '/pages/about' },
 ];
 
+function parseMenuUrl(url: string, publicStoreDomain: string) {
+  if (!url) return '';
+  if (url === '#' || url.endsWith('#')) return '#';
+  try {
+    const parsed = new URL(url);
+    const domain = publicStoreDomain.replace('https://', '').replace('http://', '');
+    if (parsed.host.includes(domain) || parsed.host.includes('myshopify.com')) {
+      return parsed.pathname + parsed.search + parsed.hash;
+    }
+    return url;
+  } catch {
+    return url;
+  }
+}
+
 // Main Header Component
-export function Header({cartCount = 0}: {cartCount?: number}) {
+export function Header({ cartCount = 0 }: { cartCount?: number }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
 
+  const rootData = useRouteLoaderData<RootLoader>('root');
+  const menu = rootData?.header?.menu;
+  const publicStoreDomain = rootData?.publicStoreDomain || '';
+
+  const menuItems = menu?.items || NAV_LINKS.map(link => ({
+    id: link.path,
+    title: link.name,
+    url: link.path,
+    items: []
+  }));
+
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link
@@ -60,26 +89,78 @@ export function Header({cartCount = 0}: {cartCount?: number}) {
             className="text-2xl font-bold tracking-widest uppercase 
                        text-[#1a1a1a] hover:text-[#c9a96e] transition-colors"
           >
-            PriyoGhosh
+            TIMECRAFTS
           </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            {NAV_LINKS.map((link) => (
-              <Link
-                key={link.path}
-                to={link.path}
-                className={`text-sm font-medium tracking-wide uppercase
-                           transition-colors hover:text-[#c9a96e]
-                           ${
-                             location.pathname === link.path
-                               ? 'text-[#c9a96e] border-b-2 border-[#c9a96e] pb-1'
-                               : 'text-gray-600'
-                           }`}
-              >
-                {link.name}
-              </Link>
-            ))}
+            {menuItems.map((item: any) => {
+              const url = parseMenuUrl(item.url, publicStoreDomain);
+              const hasChildren = item.items && item.items.length > 0;
+
+              if (hasChildren) {
+                return (
+                  <div key={item.id} className="relative group py-2">
+                    <button
+                      className="flex items-center text-sm font-medium tracking-wide uppercase
+                                 transition-colors hover:text-[#c9a96e] text-gray-600 focus:outline-none cursor-pointer"
+                    >
+                      <span>{item.title}</span>
+                      <svg
+                        className="w-4 h-4 ml-1 transform group-hover:rotate-180 transition-transform duration-200"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={1.5}
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
+                    </button>
+                    {/* Dropdown Menu */}
+                    <div
+                      className="absolute left-0 mt-2 w-48 bg-white border border-gray-100 rounded-none shadow-xl 
+                                 opacity-0 invisible group-hover:opacity-100 group-hover:visible 
+                                 transition-all duration-200 z-50 transform translate-y-2 group-hover:translate-y-0"
+                    >
+                      <div className="py-2">
+                        {item.items.map((child: any) => {
+                          const childUrl = parseMenuUrl(child.url, publicStoreDomain);
+                          return (
+                            <Link
+                              key={child.id}
+                              to={childUrl}
+                              className="block px-4 py-2 text-xs font-medium uppercase tracking-wider text-gray-600 
+                                         hover:text-[#c9a96e] hover:bg-gray-50 transition-colors"
+                            >
+                              {child.title}
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                );
+              }
+
+              return (
+                <Link
+                  key={item.id}
+                  to={url}
+                  className={`text-sm font-medium tracking-wide uppercase
+                             transition-colors hover:text-[#c9a96e]
+                             ${location.pathname === url
+                      ? 'text-[#c9a96e] border-b-2 border-[#c9a96e] pb-1'
+                      : 'text-gray-600'
+                    }`}
+                >
+                  {item.title}
+                </Link>
+              );
+            })}
           </nav>
 
           {/* Right Side Icons */}
@@ -124,7 +205,13 @@ export function Header({cartCount = 0}: {cartCount?: number}) {
             </Link>
 
             {/* Cart */}
-            <CartIcon count={cartCount} />
+            <Suspense fallback={<CartIcon count={0} />}>
+              <Await resolve={rootData?.cart}>
+                {(cart) => {
+                  return <CartIcon count={cart?.totalQuantity || 0} />;
+                }}
+              </Await>
+            </Suspense>
 
             {/* Mobile Menu Button */}
             <button
@@ -168,22 +255,47 @@ export function Header({cartCount = 0}: {cartCount?: number}) {
         {isMenuOpen && (
           <div className="md:hidden border-t border-gray-100 py-4">
             <nav className="flex flex-col space-y-4">
-              {NAV_LINKS.map((link) => (
-                <Link
-                  key={link.path}
-                  to={link.path}
-                  onClick={() => setIsMenuOpen(false)}
-                  className={`text-sm font-medium tracking-wide uppercase
-                             px-2 py-1 transition-colors hover:text-[#c9a96e]
-                             ${
-                               location.pathname === link.path
-                                 ? 'text-[#c9a96e]'
-                                 : 'text-gray-600'
-                             }`}
-                >
-                  {link.name}
-                </Link>
-              ))}
+              {menuItems.map((item: any) => {
+                const url = parseMenuUrl(item.url, publicStoreDomain);
+                const hasChildren = item.items && item.items.length > 0;
+
+                return (
+                  <div key={item.id} className="flex flex-col">
+                    {hasChildren ? (
+                      <>
+                        <span className="text-xs font-semibold tracking-wider text-gray-400 uppercase px-2 py-1">
+                          {item.title}
+                        </span>
+                        <div className="pl-4 flex flex-col space-y-3 mt-1">
+                          {item.items.map((child: any) => {
+                            const childUrl = parseMenuUrl(child.url, publicStoreDomain);
+                            return (
+                              <Link
+                                key={child.id}
+                                to={childUrl}
+                                onClick={() => setIsMenuOpen(false)}
+                                className={`text-xs font-medium tracking-wide uppercase px-2 py-1 transition-colors hover:text-[#c9a96e]
+                                           ${location.pathname === childUrl ? 'text-[#c9a96e]' : 'text-gray-600'}`}
+                              >
+                                {child.title}
+                              </Link>
+                            );
+                          })}
+                        </div>
+                      </>
+                    ) : (
+                      <Link
+                        to={url}
+                        onClick={() => setIsMenuOpen(false)}
+                        className={`text-sm font-medium tracking-wide uppercase px-2 py-1 transition-colors hover:text-[#c9a96e]
+                                   ${location.pathname === url ? 'text-[#c9a96e]' : 'text-gray-600'}`}
+                      >
+                        {item.title}
+                      </Link>
+                    )}
+                  </div>
+                );
+              })}
             </nav>
           </div>
         )}

@@ -1,5 +1,9 @@
-import {Analytics, getShopAnalytics} from '@shopify/hydrogen';
+import { Analytics, getShopAnalytics } from '@shopify/hydrogen';
 import styles from '~/styles/tailwind.css?url';
+import { Suspense } from 'react';
+import { Await } from 'react-router';
+import { Aside } from '~/components/Aside';
+import { CartMain } from '~/components/CartMain';
 
 import {
   isRouteErrorResponse,
@@ -13,9 +17,9 @@ import {
   type ShouldRevalidateFunction,
 } from 'react-router';
 import favicon from '~/assets/favicon.svg';
-import {Header} from '~/components/Header';
-import {FOOTER_QUERY, HEADER_QUERY} from '~/lib/fragments';
-import type {Route} from './+types/root';
+import { Header } from '~/components/Header';
+import { FOOTER_QUERY, HEADER_QUERY } from '~/lib/fragments';
+import type { Route } from './+types/root';
 // ❌ PageLayout remove করো
 // import {PageLayout} from './components/PageLayout';
 
@@ -33,17 +37,17 @@ export const shouldRevalidate: ShouldRevalidateFunction = ({
 
 export function links() {
   return [
-    {rel: 'preconnect', href: 'https://cdn.shopify.com'},
-    {rel: 'preconnect', href: 'https://shop.app'},
-    {rel: 'icon', type: 'image/svg+xml', href: favicon},
-    {rel: 'stylesheet', href: styles},
+    { rel: 'preconnect', href: 'https://cdn.shopify.com' },
+    { rel: 'preconnect', href: 'https://shop.app' },
+    { rel: 'icon', type: 'image/svg+xml', href: favicon },
+    { rel: 'stylesheet', href: styles },
   ];
 }
 
 export async function loader(args: Route.LoaderArgs) {
   const deferredData = loadDeferredData(args);
   const criticalData = await loadCriticalData(args);
-  const {storefront, env} = args.context;
+  const { storefront, env } = args.context;
 
   return {
     ...deferredData,
@@ -63,23 +67,23 @@ export async function loader(args: Route.LoaderArgs) {
   };
 }
 
-async function loadCriticalData({context}: Route.LoaderArgs) {
-  const {storefront} = context;
+async function loadCriticalData({ context }: Route.LoaderArgs) {
+  const { storefront } = context;
   const [header] = await Promise.all([
     storefront.query(HEADER_QUERY, {
       cache: storefront.CacheLong(),
-      variables: {headerMenuHandle: 'main-menu'},
+      variables: { headerMenuHandle: 'main-menu-hydro' },
     }),
   ]);
-  return {header};
+  return { header };
 }
 
-function loadDeferredData({context}: Route.LoaderArgs) {
-  const {storefront, customerAccount, cart} = context;
+function loadDeferredData({ context }: Route.LoaderArgs) {
+  const { storefront, customerAccount, cart } = context;
   const footer = storefront
     .query(FOOTER_QUERY, {
       cache: storefront.CacheLong(),
-      variables: {footerMenuHandle: 'footer'},
+      variables: { footerMenuHandle: 'footer' },
     })
     .catch((error: Error) => {
       console.error(error);
@@ -93,7 +97,7 @@ function loadDeferredData({context}: Route.LoaderArgs) {
 }
 
 // ✅ Layout — শুধু একটা Header
-export function Layout({children}: {children: React.ReactNode}) {
+export function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <head>
@@ -103,16 +107,36 @@ export function Layout({children}: {children: React.ReactNode}) {
         <Links />
       </head>
       <body>
-        {/* ✅ শুধু আমাদের custom Header */}
-        <Header cartCount={0} />
+        <Aside.Provider>
+          {/* ✅ শুধু আমাদের custom Header */}
+          <Header />
+          <CartAside />
 
-        {/* ✅ Page content এখানে আসবে */}
-        <main>{children}</main>
+          {/* ✅ Page content এখানে আসবে */}
+          <main>{children}</main>
+        </Aside.Provider>
 
         <ScrollRestoration />
         <Scripts />
       </body>
     </html>
+  );
+}
+
+function CartAside() {
+  const rootData = useRouteLoaderData<RootLoader>('root');
+  if (!rootData) return null;
+
+  return (
+    <Aside type="cart" heading="CART">
+      <Suspense fallback={<p className="p-6 text-gray-500 text-sm">Loading cart ...</p>}>
+        <Await resolve={rootData.cart}>
+          {(cart) => {
+            return <CartMain cart={cart} layout="aside" />;
+          }}
+        </Await>
+      </Suspense>
+    </Aside>
   );
 }
 

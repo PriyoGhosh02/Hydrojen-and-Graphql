@@ -98,27 +98,60 @@ export default function Product() {
   const {title, descriptionHtml} = product;
 
   return (
-    <div className="product">
-      <ProductImage image={selectedVariant?.image} />
-      <div className="product-main">
-        <h1>{title}</h1>
-        <ProductPrice
-          price={selectedVariant?.price}
-          compareAtPrice={selectedVariant?.compareAtPrice}
-        />
-        <br />
-        <ProductForm
-          productOptions={productOptions}
-          selectedVariant={selectedVariant}
-        />
-        <br />
-        <br />
-        <p>
-          <strong>Description</strong>
-        </p>
-        <br />
-        <div dangerouslySetInnerHTML={{__html: descriptionHtml}} />
-        <br />
+    <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20 mt-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start">
+        {/* Left Column - Product Image */}
+        <div className="bg-[#fcfcfc] border border-gray-100 p-6 sm:p-12 shadow-sm rounded-none sticky top-28 flex justify-center items-center">
+          <div className="w-full max-w-lg aspect-square overflow-hidden hover:scale-105 transition-transform duration-500">
+            <ProductImage image={selectedVariant?.image} />
+          </div>
+        </div>
+
+        {/* Right Column - Product details */}
+        <div className="flex flex-col gap-6 lg:py-2">
+          <div>
+            {/* Vendor / Brand */}
+            {product.vendor && (
+              <span className="text-[#c9a96e] text-xs font-semibold uppercase tracking-[0.25em] mb-3 block">
+                {product.vendor}
+              </span>
+            )}
+            {/* Product Title */}
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-gray-900 leading-tight mb-4">
+              {title}
+            </h1>
+            {/* Product Price */}
+            <div className="text-xl sm:text-2xl font-semibold text-gray-900 mt-2">
+              <ProductPrice
+                price={selectedVariant?.price}
+                compareAtPrice={selectedVariant?.compareAtPrice}
+              />
+            </div>
+          </div>
+
+          <hr className="border-gray-100 my-2" />
+
+          {/* Form wrapper */}
+          <div className="py-2">
+            <ProductForm
+              productOptions={productOptions}
+              selectedVariant={selectedVariant}
+            />
+          </div>
+
+          <hr className="border-gray-100 my-2" />
+
+          {/* Description Section */}
+          <div className="flex flex-col gap-4">
+            <h3 className="text-sm font-semibold tracking-widest uppercase text-gray-900">
+              Description
+            </h3>
+            <div 
+              className="prose prose-sm text-gray-600 leading-relaxed font-light font-sans max-w-none"
+              dangerouslySetInnerHTML={{__html: descriptionHtml}} 
+            />
+          </div>
+        </div>
       </div>
       <Analytics.ProductView
         data={{

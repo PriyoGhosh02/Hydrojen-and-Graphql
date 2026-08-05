@@ -458,9 +458,41 @@ export type HeroBannerQueryVariables = StorefrontAPI.Exact<{
 }>;
 
 export type HeroBannerQuery = {
-  metaobject?: StorefrontAPI.Maybe<{
-    field?: StorefrontAPI.Maybe<Pick<StorefrontAPI.MetaobjectField, 'value'>>;
-  }>;
+  metaobject?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.Metaobject, 'id'> & {
+      title?: StorefrontAPI.Maybe<Pick<StorefrontAPI.MetaobjectField, 'value'>>;
+      desc?: StorefrontAPI.Maybe<Pick<StorefrontAPI.MetaobjectField, 'value'>>;
+      btn?: StorefrontAPI.Maybe<Pick<StorefrontAPI.MetaobjectField, 'value'>>;
+      hero_media?: StorefrontAPI.Maybe<
+        Pick<StorefrontAPI.MetaobjectField, 'value'> & {
+          reference?: StorefrontAPI.Maybe<
+            | {
+                __typename:
+                  | 'Article'
+                  | 'Collection'
+                  | 'GenericFile'
+                  | 'Metaobject'
+                  | 'Model3d'
+                  | 'Page'
+                  | 'Product'
+                  | 'ProductVariant';
+              }
+            | ({__typename: 'MediaImage'} & Pick<
+                StorefrontAPI.MediaImage,
+                'id'
+              > & {
+                  image?: StorefrontAPI.Maybe<Pick<StorefrontAPI.Image, 'url'>>;
+                })
+            | ({__typename: 'Video'} & Pick<StorefrontAPI.Video, 'id'> & {
+                  sources: Array<
+                    Pick<StorefrontAPI.VideoSource, 'url' | 'mimeType'>
+                  >;
+                })
+          >;
+        }
+      >;
+    }
+  >;
 };
 
 export type ArticleQueryVariables = StorefrontAPI.Exact<{
@@ -1299,11 +1331,11 @@ interface GeneratedQueryTypes {
     return: FeaturedCollectionQuery;
     variables: FeaturedCollectionQueryVariables;
   };
-  '#graphql\n  fragment RecommendedProduct on Product {\n    id\n    title\n    handle\n    priceRange {\n      minVariantPrice {\n        amount\n        currencyCode\n      }\n    }\n    compareAtPriceRange {\n      minVariantPrice {\n        amount\n        currencyCode\n      }\n    }\n    featuredImage {\n      id\n      url\n      altText\n      width\n      height\n    }\n  }\n  query RecommendedProducts ($country: CountryCode, $language: LanguageCode)\n    @inContext(country: $country, language: $language) {\n    products(first: 8, sortKey: UPDATED_AT, reverse: true) {\n      nodes {\n        ...RecommendedProduct\n      }\n    }\n  }\n': {
+  '#graphql\n  fragment RecommendedProduct on Product {\n    id\n    title\n    handle\n    priceRange {\n      minVariantPrice {\n        amount\n        currencyCode\n      }\n    }\n    compareAtPriceRange {\n      minVariantPrice {\n        amount\n        currencyCode\n      }\n    }\n    featuredImage {\n      id\n      url\n      altText\n      width\n      height\n    }\n  }\n  query RecommendedProducts ($country: CountryCode, $language: LanguageCode)\n    @inContext(country: $country, language: $language) {\n    products(first: 20, sortKey: UPDATED_AT, reverse: true) {\n      nodes {\n        ...RecommendedProduct\n      }\n    }\n  }\n': {
     return: RecommendedProductsQuery;
     variables: RecommendedProductsQueryVariables;
   };
-  '#graphql\n  query HeroBanner {\n    metaobject(handle: {handle: "never-hunt-alone", type: "hero"}) {\n      field(key: "hero_media") {\n        value\n      }\n    }\n  }\n': {
+  '#graphql\n  query HeroBanner {\n    metaobject(handle: {handle: "never-hunt-alone", type: "hero"}) {\n      id\n      title: field(key: "title") {\n        value\n      }\n      desc: field(key: "desc") {\n        value\n      }\n      btn: field(key: "btn") {\n        value\n      }\n      hero_media: field(key: "hero_media") {\n        value\n        reference {\n          __typename\n          ... on MediaImage {\n            id\n            image {\n              url\n            }\n          }\n          ... on Video {\n            id\n            sources {\n              url\n              mimeType\n            }\n          }\n        }\n      }\n    }\n  }\n': {
     return: HeroBannerQuery;
     variables: HeroBannerQueryVariables;
   };

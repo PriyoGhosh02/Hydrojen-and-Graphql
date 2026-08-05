@@ -10,8 +10,6 @@ type CartSummaryProps = {
 };
 
 export function CartSummary({cart, layout}: CartSummaryProps) {
-  const className =
-    layout === 'page' ? 'cart-summary-page' : 'cart-summary-aside';
   const summaryId = useId();
   const discountsHeadingId = useId();
   const discountCodeInputId = useId();
@@ -19,11 +17,11 @@ export function CartSummary({cart, layout}: CartSummaryProps) {
   const giftCardInputId = useId();
 
   return (
-    <div aria-labelledby={summaryId} className={className}>
-      <h4 id={summaryId}>Totals</h4>
-      <dl role="group" className="cart-subtotal">
-        <dt>Subtotal</dt>
-        <dd>
+    <div aria-labelledby={summaryId} className="flex flex-col gap-4 bg-gray-50 p-6 border-t border-gray-100">
+      <h4 id={summaryId} className="sr-only">Totals</h4>
+      <dl role="group" className="flex items-center justify-between text-sm font-semibold text-gray-900 m-0">
+        <dt className="text-gray-500 font-normal">Subtotal</dt>
+        <dd className="text-gray-900 font-bold">
           {cart?.cost?.subtotalAmount?.amount ? (
             <Money data={cart?.cost?.subtotalAmount} />
           ) : (
@@ -50,11 +48,14 @@ function CartCheckoutActions({checkoutUrl}: {checkoutUrl?: string}) {
   if (!checkoutUrl) return null;
 
   return (
-    <div>
-      <a href={checkoutUrl} target="_self">
-        <p>Continue to Checkout &rarr;</p>
+    <div className="mt-2">
+      <a 
+        href={checkoutUrl} 
+        target="_self"
+        className="w-full text-center block bg-[#1a1a1a] hover:bg-[#c9a96e] text-white hover:text-black py-4 px-6 text-xs font-bold tracking-widest uppercase transition-all duration-300 rounded-none shadow-md cursor-pointer border border-transparent hover:-translate-y-0.5"
+      >
+        Continue to Checkout
       </a>
-      <br />
     </div>
   );
 }
