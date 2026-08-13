@@ -2,7 +2,7 @@ import {redirect, useLoaderData, Await, type ShouldRevalidateFunction} from 'rea
 import {useState, Suspense} from 'react';
 import type {Route} from './+types/products.$handle';
 import {RelatedProducts} from '~/components/RelatedProducts';
-import {BundleSave} from '~/components/BundleSave';
+
 import {
   getSelectedProductOptions,
   Analytics,
@@ -47,16 +47,9 @@ export async function loader(args: Route.LoaderArgs) {
       return null;
     });
 
-  const bundleData = loadBundleCollections(args.context.storefront)
-    .catch((err) => {
-      console.error('Bundle error', err);
-      return null;
-    });
-
   return {
     ...criticalData,
     recommendations,
-    bundleData,
   };
 }
 
@@ -105,7 +98,7 @@ function loadDeferredData({context, params}: Route.LoaderArgs) {
 }
 
 export default function Product() {
-  const {product, recommendations, bundleData} = useLoaderData<typeof loader>();
+  const {product, recommendations} = useLoaderData<typeof loader>();
 
   // Optimistically selects a variant with given available variant information
   const selectedVariant = useOptimisticVariant(
@@ -188,12 +181,6 @@ export default function Product() {
             />
           </details>
 
-          {/* Bundle & Save Section */}
-          <Suspense fallback={<p className="text-gray-400 text-xs py-4 text-center">Loading bundle collections...</p>}>
-            <Await resolve={bundleData}>
-              {(resolvedBundle) => <BundleSave bundleData={resolvedBundle} />}
-            </Await>
-          </Suspense>
 
           {/* Related Products Section */}
           <Suspense fallback={<p className="text-gray-400 text-xs py-4 text-center">Loading similar items...</p>}>
@@ -250,99 +237,7 @@ const RECOMMENDATIONS_QUERY = `#graphql
   }
 ` as const;
 
-async function loadBundleCollections(storefront: any) {
-  const query = `#graphql
-    query BundleCollections($country: CountryCode, $language: LanguageCode)
-    @inContext(country: $country, language: $language) {
-      watchCollection: collection(handle: "watch-1") {
-        products(first: 12) {
-          nodes {
-            id
-            title
-            handle
-            featuredImage {
-              url
-              altText
-              width
-              height
-            }
-            options {
-              name
-              optionValues {
-                name
-              }
-            }
-            variants(first: 100) {
-              nodes {
-                id
-                title
-                availableForSale
-                price {
-                  amount
-                  currencyCode
-                }
-                selectedOptions {
-                  name
-                  value
-                }
-                image {
-                  url
-                  altText
-                  width
-                  height
-                }
-              }
-            }
-          }
-        }
-      }
-      braceletCollection: collection(handle: "bracelet-1") {
-        products(first: 12) {
-          nodes {
-            id
-            title
-            handle
-            featuredImage {
-              url
-              altText
-              width
-              height
-            }
-            options {
-              name
-              optionValues {
-                name
-              }
-            }
-            variants(first: 100) {
-              nodes {
-                id
-                title
-                availableForSale
-                price {
-                  amount
-                  currencyCode
-                }
-                selectedOptions {
-                  name
-                  value
-                }
-                image {
-                  url
-                  altText
-                  width
-                  height
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  `;
-  
-  return storefront.query(query);
-}
+
 
 const PRODUCT_VARIANT_FRAGMENT = `#graphql
   fragment ProductVariant on ProductVariant {

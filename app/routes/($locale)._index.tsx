@@ -1,7 +1,8 @@
 import { Suspense } from 'react';
 import { Await } from 'react-router';
-import { HeroSection } from '~/components/HeroSection';
 import { FeaturedProducts } from '~/components/FeaturedProducts';
+import { HeroSection } from '~/components/HeroSection';
+import { FeaturedCollections } from '~/components/FeaturedCollections';
 import type { Route } from './+types/($locale)._index';
 
 export const meta: Route.MetaFunction = () => {
@@ -16,12 +17,12 @@ export async function loader(args: Route.LoaderArgs) {
 
 async function loadCriticalData({ context }: Route.LoaderArgs) {
   const [{ collections }, { metaobject }] = await Promise.all([
-    context.storefront.query(FEATURED_COLLECTION_QUERY),
+    context.storefront.query(FEATURED_COLLECTIONS_QUERY),
     context.storefront.query(HERO_BANNER_QUERY),
   ]);
 
   return {
-    featuredCollection: collections.nodes[0],
+    featuredCollections: collections.nodes,
     heroBanner: metaobject,
   };
 }
@@ -44,12 +45,15 @@ export default function Homepage({
 }: {
   loaderData: Awaited<ReturnType<typeof loader>>;
 }) {
-  const { recommendedProducts, heroBanner } = loaderData;
+  const { recommendedProducts, heroBanner, featuredCollections } = loaderData;
 
   return (
     <div>
       {/* Hero Section */}
       <HeroSection heroBanner={heroBanner} />
+
+      {/* Featured Collections Section */}
+      <FeaturedCollections collections={featuredCollections} />
 
       {/* Featured Products */}
       <Suspense fallback={<ProductsSkeleton />}>
@@ -87,7 +91,7 @@ function ProductsSkeleton() {
   );
 }
 
-const FEATURED_COLLECTION_QUERY = `#graphql
+const FEATURED_COLLECTIONS_QUERY = `#graphql
   fragment FeaturedCollection on Collection {
     id
     title
@@ -100,9 +104,9 @@ const FEATURED_COLLECTION_QUERY = `#graphql
     }
     handle
   }
-  query FeaturedCollection($country: CountryCode, $language: LanguageCode)
+  query FeaturedCollections($country: CountryCode, $language: LanguageCode)
     @inContext(country: $country, language: $language) {
-    collections(first: 1, sortKey: UPDATED_AT, reverse: true) {
+    collections(first: 4, sortKey: UPDATED_AT, reverse: true) {
       nodes {
         ...FeaturedCollection
       }

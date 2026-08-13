@@ -48,6 +48,7 @@ function CartIcon({ count }: { count: number }) {
 const NAV_LINKS = [
   { name: 'Home', path: '/' },
   { name: 'Collections', path: '/collections' },
+  { name: 'Bundle Builder', path: '/bundle' },
   { name: 'New Arrivals', path: '/collections/new-arrivals' },
   { name: 'Sale', path: '/collections/sale' },
   { name: 'About', path: '/pages/about' },

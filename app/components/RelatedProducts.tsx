@@ -43,7 +43,7 @@ export function RelatedProducts({
         {/* Strict 4-Column Grid */}
         <div className="grid grid-cols-4 gap-2">
           {products.map((product) => {
-            const price = product.priceRange.minVariantPrice;
+            const price = product.priceRange.minVariantPrice as any;
             const image = product.featuredImage;
 
             return (
