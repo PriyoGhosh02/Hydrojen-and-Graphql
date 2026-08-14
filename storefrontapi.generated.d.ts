@@ -586,7 +586,24 @@ export type ImageWithTextQueryVariables = StorefrontAPI.Exact<{
 export type ImageWithTextQuery = {
   metaobject?: StorefrontAPI.Maybe<
     Pick<StorefrontAPI.Metaobject, 'id'> & {
-      fields: Array<Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>>;
+      image_1?: StorefrontAPI.Maybe<
+        Pick<StorefrontAPI.MetaobjectField, 'value'>
+      >;
+      title_1?: StorefrontAPI.Maybe<
+        Pick<StorefrontAPI.MetaobjectField, 'value'>
+      >;
+      desc_1?: StorefrontAPI.Maybe<
+        Pick<StorefrontAPI.MetaobjectField, 'value'>
+      >;
+      image_2?: StorefrontAPI.Maybe<
+        Pick<StorefrontAPI.MetaobjectField, 'value'>
+      >;
+      title_2?: StorefrontAPI.Maybe<
+        Pick<StorefrontAPI.MetaobjectField, 'value'>
+      >;
+      desc_2?: StorefrontAPI.Maybe<
+        Pick<StorefrontAPI.MetaobjectField, 'value'>
+      >;
     }
   >;
 };
@@ -1459,7 +1476,7 @@ interface GeneratedQueryTypes {
     return: HeroBannerQuery;
     variables: HeroBannerQueryVariables;
   };
-  '#graphql\n  query ImageWithText {\n    metaobject(handle: {handle: "image-with-text", type: "image_with_text"}) {\n      id\n      fields {\n        key\n        value\n      }\n    }\n  }\n': {
+  '#graphql\n  query ImageWithText {\n    metaobject(handle: {handle: "image-with-text", type: "image_with_text"}) {\n      id\n      image_1: field(key: "image_1") { value }\n      title_1: field(key: "title_1") { value }\n      desc_1: field(key: "desc_1") { value }\n      image_2: field(key: "image_2") { value }\n      title_2: field(key: "title_2") { value }\n      desc_2: field(key: "desc_2") { value }\n    }\n  }\n': {
     return: ImageWithTextQuery;
     variables: ImageWithTextQueryVariables;
   };

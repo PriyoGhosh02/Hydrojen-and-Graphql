@@ -4,6 +4,7 @@ import { FeaturedProducts } from '~/components/FeaturedProducts';
 import { HeroSection } from '~/components/HeroSection';
 import { FeaturedCollections } from '~/components/FeaturedCollections';
 import { ImageWithText } from '~/components/ImageWithText';
+import { BrandShowcase } from '~/components/BrandShowcase';
 import type { Route } from './+types/($locale)._index';
 
 export const meta: Route.MetaFunction = () => {
@@ -17,30 +18,25 @@ export async function loader(args: Route.LoaderArgs) {
 }
 
 async function loadCriticalData({ context }: Route.LoaderArgs) {
-  const [{ collections }, { metaobject }, { metaobject: imageWithText }] = await Promise.all([
+  const [{ collections }, { metaobject }, { metaobject: imageWithText }, { metaobject: brandShowcase }, recommendedProducts] = await Promise.all([
     context.storefront.query(FEATURED_COLLECTIONS_QUERY),
     context.storefront.query(HERO_BANNER_QUERY),
     context.storefront.query(IMAGE_WITH_TEXT_QUERY),
+    context.storefront.query(BRAND_SHOWCASE_QUERY).catch(() => ({ metaobject: null })),
+    context.storefront.query(RECOMMENDED_PRODUCTS_QUERY).catch(() => null),
   ]);
 
   return {
     featuredCollections: collections.nodes,
     heroBanner: metaobject,
     imageWithText,
+    brandShowcase,
+    recommendedProducts,
   };
 }
 
-function loadDeferredData({ context }: Route.LoaderArgs) {
-  const recommendedProducts = context.storefront
-    .query(RECOMMENDED_PRODUCTS_QUERY)
-    .catch((error: Error) => {
-      console.error(error);
-      return null;
-    });
-
-  return {
-    recommendedProducts,
-  };
+function loadDeferredData(_args: Route.LoaderArgs) {
+  return {};
 }
 
 export default function Homepage({
@@ -48,7 +44,11 @@ export default function Homepage({
 }: {
   loaderData: Awaited<ReturnType<typeof loader>>;
 }) {
-  const { recommendedProducts, heroBanner, featuredCollections, imageWithText } = loaderData;
+  const { recommendedProducts, heroBanner, featuredCollections, imageWithText, brandShowcase } = loaderData;
+  const products =
+    recommendedProducts?.collection?.products?.nodes ||
+    recommendedProducts?.fallbackProducts?.nodes ||
+    [];
 
   return (
     <div>
@@ -59,20 +59,13 @@ export default function Homepage({
       <FeaturedCollections collections={featuredCollections} />
 
       {/* Trending Now Section */}
-      <Suspense fallback={<ProductsSkeleton />}>
-        <Await resolve={recommendedProducts}>
-          {(response) => {
-            const products =
-              response?.collection?.products?.nodes ||
-              response?.fallbackProducts?.nodes ||
-              [];
-            return <FeaturedProducts products={products} />;
-          }}
-        </Await>
-      </Suspense>
+      <FeaturedProducts products={products} />
 
       {/* Image With Text Section */}
       <ImageWithText data={imageWithText} />
+
+      {/* Brand Showcase Section */}
+      <BrandShowcase data={brandShowcase} />
     </div>
   );
 }
@@ -250,6 +243,18 @@ const IMAGE_WITH_TEXT_QUERY = `#graphql
       image_2: field(key: "image_2") { value }
       title_2: field(key: "title_2") { value }
       desc_2: field(key: "desc_2") { value }
+    }
+  }
+` as const;
+
+const BRAND_SHOWCASE_QUERY = `#graphql
+  query BrandShowcase {
+    metaobject(handle: {handle: "brand-img", type: "brand"}) {
+      id
+      fields {
+        key
+        value
+      }
     }
   }
 ` as const;

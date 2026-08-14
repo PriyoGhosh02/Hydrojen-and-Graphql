@@ -181,34 +181,26 @@ export function FeaturedProducts({ products }: { products: any[] }) {
           return overflow > 0 ? -overflow : 0;
         };
 
-        // ScrollTrigger pinning only if overflow exists
-        ScrollTrigger.create({
-          trigger: section,
-          start: 'top top',
-          end: () => `+=${track.scrollWidth - track.clientWidth}`,
-          pin: true,
-          scrub: 1,
-          invalidateOnRefresh: true,
-          onRefresh: (self) => {
-            const overflow = track.scrollWidth - track.clientWidth;
-            if (overflow <= 5) {
-              self.disable();
-              gsap.set(track, { x: 0 });
-            } else {
-              self.enable();
-            }
-          }
-        });
-
         gsap.to(track, {
           x: getScrollAmount,
           ease: 'none',
           scrollTrigger: {
             trigger: section,
             start: 'top top',
-            end: () => `+=${track.scrollWidth - track.clientWidth}`,
+            end: () => `+=${Math.max(0, track.scrollWidth - track.clientWidth)}`,
+            pin: true,
+            pinSpacing: true,
             scrub: 1,
             invalidateOnRefresh: true,
+            onRefresh: (self) => {
+              const overflow = track.scrollWidth - track.clientWidth;
+              if (overflow <= 5) {
+                self.disable();
+                gsap.set(track, { x: 0 });
+              } else {
+                self.enable();
+              }
+            },
           },
         });
       }
