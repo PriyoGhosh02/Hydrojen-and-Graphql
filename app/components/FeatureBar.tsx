@@ -174,11 +174,10 @@ export function FeatureBar() {
                 <span>{item.line1}</span>
                 {item.line2 && (
                   <span
-                    className={`block ${
-                      item.highlight
-                        ? 'font-medium tracking-wider text-white mt-0.5'
-                        : ''
-                    }`}
+                    className={`block ${item.highlight
+                      ? 'font-medium tracking-wider text-white mt-0.5'
+                      : ''
+                      }`}
                   >
                     {item.line2}
                   </span>

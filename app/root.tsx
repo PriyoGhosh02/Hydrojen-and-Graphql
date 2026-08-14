@@ -20,6 +20,7 @@ import {
 } from 'react-router';
 import favicon from '~/assets/fav.png';
 import { Header } from '~/components/Header';
+import { Footer } from '~/components/Footer';
 import { FOOTER_QUERY, HEADER_QUERY } from '~/lib/fragments';
 import type { Route } from './+types/root';
 // ❌ PageLayout remove করো
@@ -79,30 +80,24 @@ export async function loader(args: Route.LoaderArgs) {
 
 async function loadCriticalData({ context }: Route.LoaderArgs) {
   const { storefront } = context;
-  const [header] = await Promise.all([
+  const [header, footer] = await Promise.all([
     storefront.query(HEADER_QUERY, {
       cache: storefront.CacheLong(),
       variables: { headerMenuHandle: 'main-menu-hydro' },
     }),
+    storefront.query(FOOTER_QUERY, {
+      cache: storefront.CacheLong(),
+      variables: { footerMenuHandle: 'footer' },
+    }).catch(() => null),
   ]);
-  return { header };
+  return { header, footer };
 }
 
 function loadDeferredData({ context }: Route.LoaderArgs) {
-  const { storefront, customerAccount, cart } = context;
-  const footer = storefront
-    .query(FOOTER_QUERY, {
-      cache: storefront.CacheLong(),
-      variables: { footerMenuHandle: 'footer' },
-    })
-    .catch((error: Error) => {
-      console.error(error);
-      return null;
-    });
+  const { customerAccount, cart } = context;
   return {
     cart: cart.get(),
     isLoggedIn: customerAccount.isLoggedIn(),
-    footer,
   };
 }
 
@@ -148,8 +143,12 @@ export default function App() {
       shop={data.shop}
       consent={data.consent}
     >
-      {/* ✅ সরাসরি Outlet — PageLayout নেই */}
       <Outlet />
+      <Footer
+        footer={data.footer}
+        header={data.header}
+        publicStoreDomain={data.publicStoreDomain}
+      />
     </Analytics.Provider>
   );
 }

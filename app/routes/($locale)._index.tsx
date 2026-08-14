@@ -7,6 +7,7 @@ import { ImageWithText } from '~/components/ImageWithText';
 import { BrandShowcase } from '~/components/BrandShowcase';
 import { StackedBanners } from '~/components/StackedBanners';
 import { FeatureBar } from '~/components/FeatureBar';
+import { FaqSection } from '~/components/FaqSection';
 import type { Route } from './+types/($locale)._index';
 
 export const meta: Route.MetaFunction = () => {
@@ -90,6 +91,9 @@ export default function Homepage({
 
       {/* Trust & Value Feature Bar */}
       <FeatureBar />
+
+      {/* Frequently Asked Questions Section */}
+      <FaqSection />
     </div>
   );
 }
