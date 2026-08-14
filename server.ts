@@ -52,8 +52,12 @@ export default {
 
       return response;
     } catch (error) {
-      console.error(error);
-      return new Response('An unexpected error occurred', {status: 500});
+      console.error('Hydrogen Server Error:', error);
+      const message = error instanceof Error ? error.stack || error.message : String(error);
+      return new Response(`Server Error: ${message}`, {
+        status: 500,
+        headers: {'Content-Type': 'text/plain'},
+      });
     }
   },
 };
