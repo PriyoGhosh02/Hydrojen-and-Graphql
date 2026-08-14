@@ -3,6 +3,7 @@ import { Await } from 'react-router';
 import { FeaturedProducts } from '~/components/FeaturedProducts';
 import { HeroSection } from '~/components/HeroSection';
 import { FeaturedCollections } from '~/components/FeaturedCollections';
+import { ImageWithText } from '~/components/ImageWithText';
 import type { Route } from './+types/($locale)._index';
 
 export const meta: Route.MetaFunction = () => {
@@ -16,14 +17,16 @@ export async function loader(args: Route.LoaderArgs) {
 }
 
 async function loadCriticalData({ context }: Route.LoaderArgs) {
-  const [{ collections }, { metaobject }] = await Promise.all([
+  const [{ collections }, { metaobject }, { metaobject: imageWithText }] = await Promise.all([
     context.storefront.query(FEATURED_COLLECTIONS_QUERY),
     context.storefront.query(HERO_BANNER_QUERY),
+    context.storefront.query(IMAGE_WITH_TEXT_QUERY),
   ]);
 
   return {
     featuredCollections: collections.nodes,
     heroBanner: metaobject,
+    imageWithText,
   };
 }
 
@@ -45,7 +48,7 @@ export default function Homepage({
 }: {
   loaderData: Awaited<ReturnType<typeof loader>>;
 }) {
-  const { recommendedProducts, heroBanner, featuredCollections } = loaderData;
+  const { recommendedProducts, heroBanner, featuredCollections, imageWithText } = loaderData;
 
   return (
     <div>
@@ -67,6 +70,9 @@ export default function Homepage({
           }}
         </Await>
       </Suspense>
+
+      {/* Image With Text Section */}
+      <ImageWithText data={imageWithText} />
     </div>
   );
 }
@@ -140,6 +146,15 @@ const RECOMMENDED_PRODUCTS_QUERY = `#graphql
       altText
       width
       height
+    }
+    images(first: 5) {
+      nodes {
+        id
+        url
+        altText
+        width
+        height
+      }
     }
   }
   query RecommendedProducts ($country: CountryCode, $language: LanguageCode)
@@ -221,6 +236,20 @@ const HERO_BANNER_QUERY = `#graphql
           }
         }
       }
+    }
+  }
+` as const;
+
+const IMAGE_WITH_TEXT_QUERY = `#graphql
+  query ImageWithText {
+    metaobject(handle: {handle: "image-with-text", type: "image_with_text"}) {
+      id
+      image_1: field(key: "image_1") { value }
+      title_1: field(key: "title_1") { value }
+      desc_1: field(key: "desc_1") { value }
+      image_2: field(key: "image_2") { value }
+      title_2: field(key: "title_2") { value }
+      desc_2: field(key: "desc_2") { value }
     }
   }
 ` as const;

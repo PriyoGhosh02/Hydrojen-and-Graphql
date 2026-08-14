@@ -1,17 +1,60 @@
 import { Image } from '@shopify/hydrogen';
 import { Link } from 'react-router';
+import { useEffect, useRef } from 'react';
 import type { CollectionFragment } from 'storefrontapi.generated';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
 
 interface FeaturedCollectionsProps {
   collections: CollectionFragment[];
 }
 
 export function FeaturedCollections({ collections }: FeaturedCollectionsProps) {
+  const sectionRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!collections || collections.length === 0) return;
+
+    const ctx = gsap.context(() => {
+      // Header Animation
+      gsap.from('.collections-header-item', {
+        scrollTrigger: {
+          trigger: '.collections-header',
+          start: 'top 85%',
+          toggleActions: 'play none none none',
+        },
+        opacity: 0,
+        y: 30,
+        stagger: 0.15,
+        duration: 1.0,
+        ease: 'power3.out',
+      });
+
+      // Grid items staggered animation
+      gsap.from('.collection-card', {
+        scrollTrigger: {
+          trigger: '.collections-grid',
+          start: 'top 80%',
+          toggleActions: 'play none none none',
+        },
+        opacity: 0,
+        y: 40,
+        stagger: 0.2,
+        duration: 1.2,
+        ease: 'power3.out',
+      });
+    }, sectionRef);
+
+    return () => ctx.revert();
+  }, [collections]);
+
   if (!collections || collections.length === 0) return null;
 
   const filteredCollections = collections.filter((collection) => {
-    const handle = collection.handle.toLowerCase();
-    const title = collection.title.toLowerCase();
+    const handle = (collection.handle || '').toLowerCase();
+    const title = (collection.title || '').toLowerCase();
     return (
       handle.includes('bracelet') ||
       handle.includes('watch') ||
@@ -23,30 +66,30 @@ export function FeaturedCollections({ collections }: FeaturedCollectionsProps) {
   if (filteredCollections.length === 0) return null;
 
   return (
-    <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-8xl mx-auto border-b border-gray-100">
+    <section ref={sectionRef} className="relative z-10 bg-white py-20 px-4 sm:px-6 lg:px-8 max-w-8xl mx-auto border-b border-gray-100">
       {/* Section Header */}
-      <div className="text-center mb-12">
+      <div className="collections-header text-center mb-12">
         <p
-          className="text-accent text-sm font-medium tracking-[0.3em] 
+          className="collections-header-item text-accent text-sm font-medium tracking-[0.3em] 
                      uppercase mb-3"
         >
           Curated Ranges
         </p>
-        <h2 className="text-3xl sm:text-4xl font-bold text-primary tracking-tight">
+        <h2 className="collections-header-item text-3xl sm:text-4xl font-bold text-primary tracking-tight">
           Featured Collections
         </h2>
-        <div className="w-20 h-0.5 bg-accent mx-auto mt-4"></div>
+        <div className="collections-header-item w-20 h-0.5 bg-accent mx-auto mt-4"></div>
       </div>
 
       {/* Collections Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+      <div className="collections-grid grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
         {filteredCollections.map((collection, idx) => {
           return (
             <Link
               key={collection.id}
               to={`/collections/${collection.handle}`}
               prefetch="intent"
-              className="group relative block aspect-[16/9] bg-gray-50 overflow-hidden border border-gray-100/50 shadow-xs"
+              className="collection-card group relative block aspect-[16/9] bg-gray-50 overflow-hidden border border-gray-100/50 shadow-xs"
             >
               {/* Image background */}
               {collection.image ? (
