@@ -427,7 +427,35 @@ export type RecommendedProductsQueryVariables = StorefrontAPI.Exact<{
 }>;
 
 export type RecommendedProductsQuery = {
-  products: {
+  collection?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.Collection, 'id' | 'title'> & {
+      products: {
+        nodes: Array<
+          Pick<StorefrontAPI.Product, 'id' | 'title' | 'handle'> & {
+            priceRange: {
+              minVariantPrice: Pick<
+                StorefrontAPI.MoneyV2,
+                'amount' | 'currencyCode'
+              >;
+            };
+            compareAtPriceRange: {
+              minVariantPrice: Pick<
+                StorefrontAPI.MoneyV2,
+                'amount' | 'currencyCode'
+              >;
+            };
+            featuredImage?: StorefrontAPI.Maybe<
+              Pick<
+                StorefrontAPI.Image,
+                'id' | 'url' | 'altText' | 'width' | 'height'
+              >
+            >;
+          }
+        >;
+      };
+    }
+  >;
+  fallbackProducts: {
     nodes: Array<
       Pick<StorefrontAPI.Product, 'id' | 'title' | 'handle'> & {
         priceRange: {
@@ -464,6 +492,41 @@ export type HeroBannerQuery = {
       desc?: StorefrontAPI.Maybe<Pick<StorefrontAPI.MetaobjectField, 'value'>>;
       btn?: StorefrontAPI.Maybe<Pick<StorefrontAPI.MetaobjectField, 'value'>>;
       hero_media?: StorefrontAPI.Maybe<
+        Pick<StorefrontAPI.MetaobjectField, 'value'> & {
+          reference?: StorefrontAPI.Maybe<
+            | {
+                __typename:
+                  | 'Article'
+                  | 'Collection'
+                  | 'GenericFile'
+                  | 'Metaobject'
+                  | 'Model3d'
+                  | 'Page'
+                  | 'Product'
+                  | 'ProductVariant';
+              }
+            | ({__typename: 'MediaImage'} & Pick<
+                StorefrontAPI.MediaImage,
+                'id'
+              > & {
+                  image?: StorefrontAPI.Maybe<Pick<StorefrontAPI.Image, 'url'>>;
+                })
+            | ({__typename: 'Video'} & Pick<StorefrontAPI.Video, 'id'> & {
+                  sources: Array<
+                    Pick<StorefrontAPI.VideoSource, 'url' | 'mimeType'>
+                  >;
+                })
+          >;
+        }
+      >;
+      title_2?: StorefrontAPI.Maybe<
+        Pick<StorefrontAPI.MetaobjectField, 'value'>
+      >;
+      desc_2?: StorefrontAPI.Maybe<
+        Pick<StorefrontAPI.MetaobjectField, 'value'>
+      >;
+      btn_2?: StorefrontAPI.Maybe<Pick<StorefrontAPI.MetaobjectField, 'value'>>;
+      hero_media_2?: StorefrontAPI.Maybe<
         Pick<StorefrontAPI.MetaobjectField, 'value'> & {
           reference?: StorefrontAPI.Maybe<
             | {
@@ -1355,11 +1418,11 @@ interface GeneratedQueryTypes {
     return: FeaturedCollectionsQuery;
     variables: FeaturedCollectionsQueryVariables;
   };
-  '#graphql\n  fragment RecommendedProduct on Product {\n    id\n    title\n    handle\n    priceRange {\n      minVariantPrice {\n        amount\n        currencyCode\n      }\n    }\n    compareAtPriceRange {\n      minVariantPrice {\n        amount\n        currencyCode\n      }\n    }\n    featuredImage {\n      id\n      url\n      altText\n      width\n      height\n    }\n  }\n  query RecommendedProducts ($country: CountryCode, $language: LanguageCode)\n    @inContext(country: $country, language: $language) {\n    products(first: 20, sortKey: UPDATED_AT, reverse: true) {\n      nodes {\n        ...RecommendedProduct\n      }\n    }\n  }\n': {
+  '#graphql\n  fragment RecommendedProduct on Product {\n    id\n    title\n    handle\n    priceRange {\n      minVariantPrice {\n        amount\n        currencyCode\n      }\n    }\n    compareAtPriceRange {\n      minVariantPrice {\n        amount\n        currencyCode\n      }\n    }\n    featuredImage {\n      id\n      url\n      altText\n      width\n      height\n    }\n  }\n  query RecommendedProducts ($country: CountryCode, $language: LanguageCode)\n    @inContext(country: $country, language: $language) {\n    collection(handle: "trending") {\n      id\n      title\n      products(first: 8) {\n        nodes {\n          ...RecommendedProduct\n        }\n      }\n    }\n    fallbackProducts: products(first: 8, sortKey: UPDATED_AT, reverse: true) {\n      nodes {\n        ...RecommendedProduct\n      }\n    }\n  }\n': {
     return: RecommendedProductsQuery;
     variables: RecommendedProductsQueryVariables;
   };
-  '#graphql\n  query HeroBanner {\n    metaobject(handle: {handle: "never-hunt-alone", type: "hero"}) {\n      id\n      title: field(key: "title") {\n        value\n      }\n      desc: field(key: "desc") {\n        value\n      }\n      btn: field(key: "btn") {\n        value\n      }\n      hero_media: field(key: "hero_media") {\n        value\n        reference {\n          __typename\n          ... on MediaImage {\n            id\n            image {\n              url\n            }\n          }\n          ... on Video {\n            id\n            sources {\n              url\n              mimeType\n            }\n          }\n        }\n      }\n    }\n  }\n': {
+  '#graphql\n  query HeroBanner {\n    metaobject(handle: {handle: "never-hunt-alone", type: "hero"}) {\n      id\n      title: field(key: "title") {\n        value\n      }\n      desc: field(key: "desc") {\n        value\n      }\n      btn: field(key: "btn") {\n        value\n      }\n      hero_media: field(key: "hero_media") {\n        value\n        reference {\n          __typename\n          ... on MediaImage {\n            id\n            image {\n              url\n            }\n          }\n          ... on Video {\n            id\n            sources {\n              url\n              mimeType\n            }\n          }\n        }\n      }\n      title_2: field(key: "title_2") {\n        value\n      }\n      desc_2: field(key: "desc_2") {\n        value\n      }\n      btn_2: field(key: "btn_2") {\n        value\n      }\n      hero_media_2: field(key: "hero_media_2") {\n        value\n        reference {\n          __typename\n          ... on MediaImage {\n            id\n            image {\n              url\n            }\n          }\n          ... on Video {\n            id\n            sources {\n              url\n              mimeType\n            }\n          }\n        }\n      }\n    }\n  }\n': {
     return: HeroBannerQuery;
     variables: HeroBannerQueryVariables;
   };

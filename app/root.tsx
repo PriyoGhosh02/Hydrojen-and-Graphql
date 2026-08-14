@@ -1,4 +1,4 @@
-import { Analytics, getShopAnalytics } from '@shopify/hydrogen';
+import { Analytics, getShopAnalytics, useNonce } from '@shopify/hydrogen';
 import styles from '~/styles/tailwind.css?url';
 import appStyles from '~/styles/app.css?url';
 import { Suspense } from 'react';
@@ -102,6 +102,7 @@ function loadDeferredData({ context }: Route.LoaderArgs) {
 
 // ✅ Layout — শুধু একটা Header
 export function Layout({ children }: { children: React.ReactNode }) {
+  const nonce = useNonce();
   return (
     <html lang="en">
       <head>
@@ -120,8 +121,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
           <main>{children}</main>
         </Aside.Provider>
 
-        <ScrollRestoration />
-        <Scripts />
+        <ScrollRestoration nonce={nonce} />
+        <Scripts nonce={nonce} />
       </body>
     </html>
   );

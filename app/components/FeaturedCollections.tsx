@@ -9,6 +9,19 @@ interface FeaturedCollectionsProps {
 export function FeaturedCollections({ collections }: FeaturedCollectionsProps) {
   if (!collections || collections.length === 0) return null;
 
+  const filteredCollections = collections.filter((collection) => {
+    const handle = collection.handle.toLowerCase();
+    const title = collection.title.toLowerCase();
+    return (
+      handle.includes('bracelet') ||
+      handle.includes('watch') ||
+      title.includes('bracelet') ||
+      title.includes('watch')
+    );
+  });
+
+  if (filteredCollections.length === 0) return null;
+
   return (
     <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-8xl mx-auto border-b border-gray-100">
       {/* Section Header */}
@@ -26,14 +39,14 @@ export function FeaturedCollections({ collections }: FeaturedCollectionsProps) {
       </div>
 
       {/* Collections Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
-        {collections.map((collection, idx) => {
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+        {filteredCollections.map((collection, idx) => {
           return (
             <Link
               key={collection.id}
               to={`/collections/${collection.handle}`}
               prefetch="intent"
-              className="group relative block aspect-[4/5] bg-gray-50 overflow-hidden border border-gray-100/50 shadow-xs"
+              className="group relative block aspect-[16/9] bg-gray-50 overflow-hidden border border-gray-100/50 shadow-xs"
             >
               {/* Image background */}
               {collection.image ? (
@@ -41,8 +54,8 @@ export function FeaturedCollections({ collections }: FeaturedCollectionsProps) {
                   data={collection.image}
                   className="w-full h-full object-cover transition-transform 
                              duration-700 ease-out group-hover:scale-105"
-                  sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-                  loading={idx < 4 ? 'eager' : 'lazy'}
+                  sizes="(min-width: 768px) 50vw, 100vw"
+                  loading={idx < 2 ? 'eager' : 'lazy'}
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400">

@@ -55,11 +55,14 @@ export default function Homepage({
       {/* Featured Collections Section */}
       <FeaturedCollections collections={featuredCollections} />
 
-      {/* Featured Products */}
+      {/* Trending Now Section */}
       <Suspense fallback={<ProductsSkeleton />}>
         <Await resolve={recommendedProducts}>
           {(response) => {
-            const products = response?.products?.nodes || [];
+            const products =
+              response?.collection?.products?.nodes ||
+              response?.fallbackProducts?.nodes ||
+              [];
             return <FeaturedProducts products={products} />;
           }}
         </Await>
@@ -141,7 +144,16 @@ const RECOMMENDED_PRODUCTS_QUERY = `#graphql
   }
   query RecommendedProducts ($country: CountryCode, $language: LanguageCode)
     @inContext(country: $country, language: $language) {
-    products(first: 20, sortKey: UPDATED_AT, reverse: true) {
+    collection(handle: "trending") {
+      id
+      title
+      products(first: 8) {
+        nodes {
+          ...RecommendedProduct
+        }
+      }
+    }
+    fallbackProducts: products(first: 8, sortKey: UPDATED_AT, reverse: true) {
       nodes {
         ...RecommendedProduct
       }
@@ -163,6 +175,34 @@ const HERO_BANNER_QUERY = `#graphql
         value
       }
       hero_media: field(key: "hero_media") {
+        value
+        reference {
+          __typename
+          ... on MediaImage {
+            id
+            image {
+              url
+            }
+          }
+          ... on Video {
+            id
+            sources {
+              url
+              mimeType
+            }
+          }
+        }
+      }
+      title_2: field(key: "title_2") {
+        value
+      }
+      desc_2: field(key: "desc_2") {
+        value
+      }
+      btn_2: field(key: "btn_2") {
+        value
+      }
+      hero_media_2: field(key: "hero_media_2") {
         value
         reference {
           __typename

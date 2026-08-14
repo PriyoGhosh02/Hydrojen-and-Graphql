@@ -96,7 +96,7 @@ export function FeaturedProducts({ products }: { products: any[] }) {
           Curated For You
         </p>
         <h2 className="text-3xl sm:text-4xl font-bold text-primary">
-          Featured Products
+          Trending Now
         </h2>
         <div className="w-20 h-0.5 bg-accent mx-auto mt-4"></div>
       </div>
@@ -114,13 +114,13 @@ export function FeaturedProducts({ products }: { products: any[] }) {
       {/* View All Button */}
       <div className="text-center mt-12">
         <Link
-          to="/collections/all"
+          to="/collections/trending"
           className="inline-block border-2 border-primary text-primary 
                      px-10 py-3 text-sm font-semibold tracking-widest 
                      uppercase hover:bg-primary hover:text-white 
                      transition-all duration-300"
         >
-          View All Products
+          View Trending Collection
         </Link>
       </div>
     </section>
