@@ -5,6 +5,8 @@ import { HeroSection } from '~/components/HeroSection';
 import { FeaturedCollections } from '~/components/FeaturedCollections';
 import { ImageWithText } from '~/components/ImageWithText';
 import { BrandShowcase } from '~/components/BrandShowcase';
+import { StackedBanners } from '~/components/StackedBanners';
+import { FeatureBar } from '~/components/FeatureBar';
 import type { Route } from './+types/($locale)._index';
 
 export const meta: Route.MetaFunction = () => {
@@ -18,19 +20,28 @@ export async function loader(args: Route.LoaderArgs) {
 }
 
 async function loadCriticalData({ context }: Route.LoaderArgs) {
-  const [{ collections }, { metaobject }, { metaobject: imageWithText }, { metaobject: brandShowcase }, recommendedProducts] = await Promise.all([
+  const [
+    { collections },
+    { metaobject: heroBanner },
+    { metaobject: imageWithText },
+    { metaobject: brandShowcase },
+    { metaobject: stackedBanners },
+    recommendedProducts,
+  ] = await Promise.all([
     context.storefront.query(FEATURED_COLLECTIONS_QUERY),
     context.storefront.query(HERO_BANNER_QUERY),
     context.storefront.query(IMAGE_WITH_TEXT_QUERY),
     context.storefront.query(BRAND_SHOWCASE_QUERY).catch(() => ({ metaobject: null })),
+    context.storefront.query(STACKED_BANNERS_QUERY).catch(() => ({ metaobject: null })),
     context.storefront.query(RECOMMENDED_PRODUCTS_QUERY).catch(() => null),
   ]);
 
   return {
     featuredCollections: collections.nodes,
-    heroBanner: metaobject,
+    heroBanner,
     imageWithText,
     brandShowcase,
+    stackedBanners,
     recommendedProducts,
   };
 }
@@ -44,7 +55,14 @@ export default function Homepage({
 }: {
   loaderData: Awaited<ReturnType<typeof loader>>;
 }) {
-  const { recommendedProducts, heroBanner, featuredCollections, imageWithText, brandShowcase } = loaderData;
+  const {
+    recommendedProducts,
+    heroBanner,
+    featuredCollections,
+    imageWithText,
+    brandShowcase,
+    stackedBanners,
+  } = loaderData;
   const products =
     recommendedProducts?.collection?.products?.nodes ||
     recommendedProducts?.fallbackProducts?.nodes ||
@@ -66,6 +84,12 @@ export default function Homepage({
 
       {/* Brand Showcase Section */}
       <BrandShowcase data={brandShowcase} />
+
+      {/* 3-Banner Overlapping Stack Section */}
+      <StackedBanners data={stackedBanners} />
+
+      {/* Trust & Value Feature Bar */}
+      <FeatureBar />
     </div>
   );
 }
@@ -250,6 +274,18 @@ const IMAGE_WITH_TEXT_QUERY = `#graphql
 const BRAND_SHOWCASE_QUERY = `#graphql
   query BrandShowcase {
     metaobject(handle: {handle: "brand-img", type: "brand"}) {
+      id
+      fields {
+        key
+        value
+      }
+    }
+  }
+` as const;
+
+const STACKED_BANNERS_QUERY = `#graphql
+  query StackedBanners {
+    metaobject(handle: {handle: "banner-3", type: "3_banner"}) {
       id
       fields {
         key

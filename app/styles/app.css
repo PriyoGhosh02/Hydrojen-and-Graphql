@@ -8,6 +8,31 @@
   --color-light: #fff;
 }
 
+*,
+*::before,
+*::after {
+  font-family: 'Jost', sans-serif;
+}
+
+html,
+body,
+button,
+input,
+optgroup,
+select,
+textarea,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+a,
+span {
+  font-family: 'Jost', sans-serif !important;
+}
+
 img {
   border-radius: 4px;
 }

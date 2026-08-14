@@ -75,7 +75,7 @@ export function FeaturedCollections({ collections }: FeaturedCollectionsProps) {
         >
           Curated Ranges
         </p>
-        <h2 className="collections-header-item text-3xl sm:text-4xl font-bold text-primary tracking-tight">
+        <h2 className="collections-header-item text-3xl sm:text-5xl font-normal text-primary tracking-tight">
           Featured Collections
         </h2>
         <div className="collections-header-item w-20 h-0.5 bg-accent mx-auto mt-4"></div>

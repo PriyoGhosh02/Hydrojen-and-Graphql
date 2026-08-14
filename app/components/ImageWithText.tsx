@@ -83,7 +83,7 @@ export function ImageWithText({ data }: ImageWithTextProps) {
               <p className="text-accent text-sm font-semibold tracking-[0.3em] uppercase mb-4">
                 Timeless Gold
               </p>
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-primary mb-6 leading-tight font-sans">
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-normal text-primary mb-6 leading-tight font-sans">
                 {data.title_1?.value || 'Timeless Gold, Effortless Elegance'}
               </h2>
               <p className="text-gray-500 text-sm sm:text-base leading-relaxed font-light">
@@ -96,10 +96,10 @@ export function ImageWithText({ data }: ImageWithTextProps) {
               <p className="text-accent text-sm font-semibold tracking-[0.3em] uppercase mb-4">
                 Precision Craft
               </p>
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-primary mb-6 leading-tight font-sans">
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-normal text-primary mb-6 leading-tight font-sans">
                 {data.title_2?.value || 'Precision Meets Timeless Style'}
               </h2>
-              <p className="text-gray-500 text-sm sm:text-base leading-relaxed font-light">
+              <p className="text-gray-500 text-base sm:text-base leading-relaxed font-light">
                 {data.desc_2?.value}
               </p>
             </div>

@@ -22,9 +22,8 @@ function ProductCard({ product }: { product: any }) {
             return (
               <div
                 key={img.id || idx}
-                className={`absolute inset-0 w-full h-full transition-opacity duration-500 ease-in-out ${
-                  isActive ? 'opacity-100' : 'opacity-0 pointer-events-none'
-                }`}
+                className={`absolute inset-0 w-full h-full transition-opacity duration-500 ease-in-out ${isActive ? 'opacity-100' : 'opacity-0 pointer-events-none'
+                  }`}
               >
                 <Image
                   data={img}
@@ -98,9 +97,8 @@ function ProductCard({ product }: { product: any }) {
                     e.stopPropagation();
                     setCurrentImgIndex(idx);
                   }}
-                  className={`w-1.5 h-1.5 transition-all duration-300 rounded-none ${
-                    idx === currentImgIndex ? 'bg-accent w-3' : 'bg-white/60 hover:bg-white'
-                  }`}
+                  className={`w-1.5 h-1.5 transition-all duration-300 rounded-none ${idx === currentImgIndex ? 'bg-accent w-3' : 'bg-white/60 hover:bg-white'
+                    }`}
                   aria-label={`Go to image ${idx + 1}`}
                 />
               ))}
@@ -173,7 +171,7 @@ export function FeaturedProducts({ products }: { products: any[] }) {
 
       const track = trackRef.current;
       const section = sectionRef.current;
-      
+
       if (track && section) {
         // Measure horizontal overflow dynamically
         const getScrollAmount = () => {
@@ -218,8 +216,8 @@ export function FeaturedProducts({ products }: { products: any[] }) {
   }
 
   return (
-    <section 
-      ref={sectionRef} 
+    <section
+      ref={sectionRef}
       className="relative z-10 bg-white py-20 min-h-screen flex flex-col justify-center overflow-hidden"
     >
       {/* Section Header */}
@@ -230,7 +228,7 @@ export function FeaturedProducts({ products }: { products: any[] }) {
         >
           Curated For You
         </p>
-        <h2 className="products-header-item text-3xl sm:text-4xl font-bold text-primary">
+        <h2 className="products-header-item text-3xl sm:text-5xl font-normal text-primary">
           Trending Now
         </h2>
         <div className="products-header-item w-20 h-0.5 bg-accent mx-auto mt-4"></div>
@@ -243,8 +241,8 @@ export function FeaturedProducts({ products }: { products: any[] }) {
           className="products-track flex flex-row flex-nowrap gap-6 sm:gap-8 w-full"
         >
           {products.map((product) => (
-            <div 
-              key={product.id} 
+            <div
+              key={product.id}
               className="product-card-item shrink-0 w-[calc((100%-1.5rem)/2)] md:w-[calc((100%-3*1.5rem)/4)] lg:w-[calc((100%-3*2rem)/4)]"
             >
               <ProductCard product={product} />

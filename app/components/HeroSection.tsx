@@ -109,7 +109,7 @@ function SlideContent({
           </p>
 
           {/* Title */}
-          <h1 className="text-white text-5xl sm:text-7xl lg:text-8xl font-extrabold leading-none tracking-tight mb-8 font-sans">
+          <h1 className="text-white text-5xl sm:text-7xl lg:text-8xl font-normal leading-none tracking-tight mb-8 font-sans">
             {mainWords.map((word: string, i: number) => (
               <span key={i} className="title-word inline-block mr-3 sm:mr-4">
                 {word}

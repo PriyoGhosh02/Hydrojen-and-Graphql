@@ -12,16 +12,16 @@ export function BrandShowcase({ data }: BrandShowcaseProps) {
   // Extract all valid image URLs from data fields
   const userLogos = data?.fields
     ? data.fields
-        .filter((f: any) => f.key.startsWith('img') && f.value)
-        .map((f: any) => f.value)
+      .filter((f: any) => f.key.startsWith('img') && f.value)
+      .map((f: any) => f.value)
     : [
-        data?.img_1?.value,
-        data?.img_2?.value,
-        data?.img_3?.value,
-        data?.img_4?.value,
-        data?.img_5?.value,
-        data?.img_6?.value,
-      ].filter(Boolean);
+      data?.img_1?.value,
+      data?.img_2?.value,
+      data?.img_3?.value,
+      data?.img_4?.value,
+      data?.img_5?.value,
+      data?.img_6?.value,
+    ].filter(Boolean);
 
   // High-end fallback luxury brand logos / text if user hasn't provided all 6 yet
   const fallbackLogos = [
@@ -52,7 +52,7 @@ export function BrandShowcase({ data }: BrandShowcaseProps) {
     if (!trackRef.current) return;
 
     const track = trackRef.current;
-    
+
     // Ensure layout is measured after render
     const halfWidth = track.scrollWidth / 2;
 
@@ -82,7 +82,7 @@ export function BrandShowcase({ data }: BrandShowcaseProps) {
   };
 
   return (
-    <section 
+    <section
       className="relative z-10 w-full py-12 sm:py-16 overflow-hidden select-none bg-white"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
@@ -109,7 +109,7 @@ export function BrandShowcase({ data }: BrandShowcaseProps) {
                   <img
                     src={item}
                     alt="Brand Logo"
-                    className="max-h-10 sm:max-h-12 w-auto object-contain opacity-50 group-hover:opacity-100 transition-all duration-300 filter grayscale group-hover:grayscale-0"
+                    className="max-h-10 sm:max-h-12 w-auto object-contain opacity-80 group-hover:opacity-50 transition-all duration-300"
                     draggable="false"
                   />
                 ) : (
