@@ -1,5 +1,6 @@
-import {Link} from 'react-router';
-import {Image, Money} from '@shopify/hydrogen';
+import { useRef } from 'react';
+import { Link } from 'react-router';
+import { Image, Money } from '@shopify/hydrogen';
 
 export function RelatedProducts({
   recommendations,
@@ -25,23 +26,68 @@ export function RelatedProducts({
     }>;
   } | null;
 }) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+
   if (!recommendations || !recommendations.productRecommendations?.length) return null;
 
-  // We slice to 4 to maintain a strict 4-column grid layout
-  const products = recommendations.productRecommendations.slice(0, 4);
+  const products = recommendations.productRecommendations;
+  const hasMoreThanThree = products.length > 3;
+
+  const scrollLeft = () => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({ left: -280, behavior: 'smooth' });
+    }
+  };
+
+  const scrollRight = () => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({ left: 280, behavior: 'smooth' });
+    }
+  };
 
   return (
-    <section className="py-6 border-t border-gray-100 mt-6">
-      <div className="flex flex-col gap-3">
-        {/* Header Section */}
-        <div>
-          <h2 className="text-[10px] font-bold uppercase tracking-widest text-primary m-0">
-            Shop Similar
-          </h2>
+    <section className="py-8 border-t border-gray-100 mt-8 font-sans">
+      <div className="flex flex-col gap-5">
+        {/* Header Section with Navigation Arrows */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-xs font-bold uppercase tracking-[0.2em] text-primary m-0">
+              Recommended For You
+            </h2>
+          </div>
+
+          <div className="flex items-center gap-3">
+            {hasMoreThanThree && (
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={scrollLeft}
+                  aria-label="Scroll left"
+                  className="w-7 h-7 rounded-full border border-gray-200 hover:border-black bg-white hover:bg-black hover:text-white transition-all flex items-center justify-center text-[10px] cursor-pointer shadow-2xs"
+                >
+                  ◀
+                </button>
+                <button
+                  type="button"
+                  onClick={scrollRight}
+                  aria-label="Scroll right"
+                  className="w-7 h-7 rounded-full border border-gray-200 hover:border-black bg-white hover:bg-black hover:text-white transition-all flex items-center justify-center text-[10px] cursor-pointer shadow-2xs"
+                >
+                  ▶
+                </button>
+              </div>
+            )}
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-[#d4af37]">
+              Hand-picked
+            </span>
+          </div>
         </div>
 
-        {/* Strict 4-Column Grid */}
-        <div className="grid grid-cols-4 gap-2">
+        {/* Carousel Slider: Shows 3 cards initially, left/right scrollable for more */}
+        <div
+          ref={scrollRef}
+          className="flex items-stretch gap-4 sm:gap-5 overflow-x-auto snap-x snap-mandatory scrollbar-none py-1 scroll-smooth"
+        >
           {products.map((product) => {
             const price = product.priceRange.minVariantPrice as any;
             const image = product.featuredImage;
@@ -50,51 +96,39 @@ export function RelatedProducts({
               <Link
                 key={product.id}
                 to={`/products/${product.handle}`}
-                className="group block"
+                className="group shrink-0 w-[calc(50%-8px)] sm:w-[calc(33.333%-11px)] snap-start flex flex-col bg-white border border-gray-100 p-3 hover:border-gray-200 hover:shadow-lg transition-all duration-300 select-none"
               >
-                {/* Image Container with Hover Trigger */}
-                <div className="relative overflow-hidden bg-[#f5f5f5] aspect-[3/4] border border-gray-50">
+                {/* Image Container */}
+                <div className="relative overflow-hidden bg-[#f9f9f9] aspect-square w-full">
                   {image ? (
                     <Image
                       alt={image.altText || product.title}
                       data={image}
-                      aspectRatio="3/4"
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      sizes="120px"
+                      aspectRatio="1/1"
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-108"
+                      sizes="(min-width: 45em) 250px, 50vw"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-300">
-                      <svg
-                        className="w-6 h-6"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={1}
-                          d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                        />
-                      </svg>
+                    <div className="w-full h-full flex items-center justify-center text-gray-300 text-xs">
+                      TimeCrafts
                     </div>
                   )}
 
                   {/* Micro Quick View Overlay */}
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300 flex items-end justify-center pb-2">
-                    <span className="bg-white text-primary px-2.5 py-1 text-[8px] font-bold tracking-wider uppercase opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    <span className="bg-white text-primary px-3 py-1 text-[9px] font-bold tracking-wider uppercase opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-xs">
                       View
                     </span>
                   </div>
                 </div>
 
                 {/* Info */}
-                <div className="mt-1.5 text-center">
-                  <h3 className="text-[9px] font-medium text-primary tracking-wide group-hover:text-accent transition-colors truncate px-0.5">
+                <div className="mt-3 flex flex-col justify-between flex-1">
+                  <h3 className="text-xs font-medium text-primary group-hover:text-accent transition-colors line-clamp-2 leading-snug">
                     {product.title}
                   </h3>
-                  <div className="mt-0.5">
-                    <span className="text-[9px] font-bold text-primary">
+                  <div className="mt-2 pt-2 border-t border-gray-50 flex items-center justify-between">
+                    <span className="text-xs font-semibold text-primary">
                       <Money data={price} />
                     </span>
                   </div>
