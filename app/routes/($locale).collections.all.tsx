@@ -1,12 +1,15 @@
 import type {Route} from './+types/collections.all';
-import {useLoaderData} from 'react-router';
+import {useLoaderData, Link} from 'react-router';
 import {getPaginationVariables, Image, Money} from '@shopify/hydrogen';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 import {ProductItem} from '~/components/ProductItem';
 import type {CollectionItemFragment} from 'storefrontapi.generated';
 
+const CATALOG_HERO_IMAGE =
+  'https://images.unsplash.com/photo-1524805444758-089113d48a6d?q=80&w=1920&auto=format&fit=crop';
+
 export const meta: Route.MetaFunction = () => {
-  return [{title: `Products | TimeCrafts`}];
+  return [{title: `All Products | TimeCrafts`}];
 };
 
 export async function loader(args: Route.LoaderArgs) {
@@ -19,10 +22,6 @@ export async function loader(args: Route.LoaderArgs) {
   return {...deferredData, ...criticalData};
 }
 
-/**
- * Load data necessary for rendering content above the fold. This is the critical data
- * needed to render the page. If it's unavailable, the whole page should 400 or 500 error.
- */
 async function loadCriticalData({context, request}: Route.LoaderArgs) {
   const {storefront} = context;
   const paginationVariables = getPaginationVariables(request, {
@@ -33,38 +32,89 @@ async function loadCriticalData({context, request}: Route.LoaderArgs) {
     storefront.query(CATALOG_QUERY, {
       variables: {...paginationVariables},
     }),
-    // Add other queries here, so that they are loaded in parallel
   ]);
   return {products};
 }
 
-/**
- * Load data for rendering content below the fold. This data is deferred and will be
- * fetched after the initial page load. If it's unavailable, the page should still 200.
- * Make sure to not throw any errors here, as it will cause the page to 500.
- */
 function loadDeferredData({context}: Route.LoaderArgs) {
   return {};
 }
 
 export default function Collection() {
   const {products} = useLoaderData<typeof loader>();
+  const productCount = products?.nodes?.length || 0;
 
   return (
-    <div className="collection">
-      <h1>Products</h1>
-      <PaginatedResourceSection<CollectionItemFragment>
-        connection={products}
-        resourcesClassName="products-grid"
-      >
-        {({node: product, index}) => (
-          <ProductItem
-            key={product.id}
-            product={product}
-            loading={index < 8 ? 'eager' : undefined}
+    <div className="collection-page font-sans min-h-screen bg-white">
+      {/* 1. TOP CATALOG HERO BANNER: 30% VIEWPORT HEIGHT (~30vh) */}
+      <section className="relative w-full h-[30vh] min-h-[280px] max-h-[360px] overflow-hidden flex items-center justify-center bg-[#121212] text-white select-none">
+        {/* Background Image Container */}
+        <div className="absolute inset-0 z-0">
+          <img
+            src={CATALOG_HERO_IMAGE}
+            alt="TimeCrafts Master Catalog"
+            className="w-full h-full object-cover object-center opacity-60 scale-105 transition-transform duration-1000"
           />
-        )}
-      </PaginatedResourceSection>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/70 backdrop-blur-[0.5px]"></div>
+        </div>
+
+        {/* Banner Content Container */}
+        <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center py-6">
+          {/* Breadcrumbs */}
+          <nav className="flex items-center justify-center gap-2 text-[11px] font-semibold uppercase tracking-[0.25em] text-[#d4af37] mb-3">
+            <Link to="/" className="hover:text-white transition-colors">Home</Link>
+            <span>/</span>
+            <Link to="/collections" className="hover:text-white transition-colors">Collections</Link>
+            <span>/</span>
+            <span className="text-gray-300 font-light">All Products</span>
+          </nav>
+
+          {/* Main Title */}
+          <h1 className="text-3xl sm:text-5xl font-normal tracking-tight text-white uppercase mb-3">
+            All Timepieces & Jewelry
+          </h1>
+
+          {/* Description */}
+          <p className="text-xs sm:text-sm text-gray-300 font-light max-w-2xl mx-auto leading-relaxed line-clamp-2">
+            Explore our complete range of luxury wristwatches, executive bracelets, and bespoke gentleman accessories.
+          </p>
+        </div>
+      </section>
+
+      {/* 2. CATALOG CONTENT & PRODUCT GRID */}
+      <section className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16">
+        {/* Filter & Count Header Bar */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-gray-100 mb-8">
+          <div>
+            <span className="text-xs font-bold uppercase tracking-wider text-primary font-sans">
+              Showing {productCount} Master Products
+            </span>
+            <p className="text-xs text-gray-500 font-light mt-0.5">
+              Precision Swiss mechanics, sapphire crystal, and premium materials.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">
+              Master Catalog
+            </span>
+          </div>
+        </div>
+
+        {/* Products Grid */}
+        <PaginatedResourceSection<CollectionItemFragment>
+          connection={products}
+          resourcesClassName="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8"
+        >
+          {({node: product, index}) => (
+            <ProductItem
+              key={product.id}
+              product={product}
+              loading={index < 8 ? 'eager' : undefined}
+            />
+          )}
+        </PaginatedResourceSection>
+      </section>
     </div>
   );
 }
@@ -90,6 +140,11 @@ const COLLECTION_ITEM_FRAGMENT = `#graphql
         ...MoneyCollectionItem
       }
       maxVariantPrice {
+        ...MoneyCollectionItem
+      }
+    }
+    compareAtPriceRange {
+      minVariantPrice {
         ...MoneyCollectionItem
       }
     }

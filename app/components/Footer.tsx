@@ -52,7 +52,7 @@ export function Footer({
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10 lg:gap-12 pb-12 sm:pb-16 border-b border-gray-300/70">
           {/* Column 1: Brand Info & Social Icons */}
           <div className="flex flex-col items-start">
-            <h3 className="text-3xl font-bold tracking-[0.2em] uppercase text-primary mb-4 font-sans">
+            <h3 className="text-3xl font-bold tracking-[0.2em] uppercase text-primary mb-4 font-sans text-[#d8b74b]">
               {/* {brandName} */}
               TIMECRAFTS
             </h3>
