@@ -66,30 +66,30 @@ export function FeaturedCollections({ collections }: FeaturedCollectionsProps) {
   if (filteredCollections.length === 0) return null;
 
   return (
-    <section ref={sectionRef} className="relative z-10 bg-white py-20 px-4 sm:px-6 lg:px-8 max-w-8xl mx-auto border-b border-gray-100">
+    <section ref={sectionRef} className="relative z-10 bg-white py-12 sm:py-20 px-4 sm:px-6 lg:px-8 max-w-8xl mx-auto border-b border-gray-100">
       {/* Section Header */}
-      <div className="collections-header text-center mb-12">
+      <div className="collections-header text-center mb-8 sm:mb-12">
         <p
-          className="collections-header-item text-accent text-sm font-medium tracking-[0.3em] 
-                     uppercase mb-3"
+          className="collections-header-item text-accent text-xs sm:text-sm font-medium tracking-[0.25em] sm:tracking-[0.3em] 
+                     uppercase mb-2 sm:mb-3"
         >
           Curated Ranges
         </p>
-        <h2 className="collections-header-item text-3xl sm:text-5xl font-normal text-primary tracking-tight">
+        <h2 className="collections-header-item text-2xl sm:text-5xl font-normal text-primary tracking-tight">
           Featured Collections
         </h2>
-        <div className="collections-header-item w-20 h-0.5 bg-accent mx-auto mt-4"></div>
+        <div className="collections-header-item w-16 sm:w-20 h-0.5 bg-accent mx-auto mt-3 sm:mt-4"></div>
       </div>
 
       {/* Collections Grid */}
-      <div className="collections-grid grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+      <div className="collections-grid grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-8">
         {filteredCollections.map((collection, idx) => {
           return (
             <Link
               key={collection.id}
               to={`/collections/${collection.handle}`}
               prefetch="intent"
-              className="collection-card group relative block aspect-[16/9] bg-gray-50 overflow-hidden border border-gray-100/50 shadow-xs"
+              className="collection-card group relative block aspect-[4/3] sm:aspect-[16/9] bg-gray-50 overflow-hidden border border-gray-100/50 shadow-xs"
             >
               {/* Image background */}
               {collection.image ? (
@@ -119,19 +119,19 @@ export function FeaturedCollections({ collections }: FeaturedCollectionsProps) {
 
               {/* Overlay with details */}
               <div
-                className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent 
+                className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent 
                            group-hover:from-black/90 group-hover:via-black/35 transition-all 
-                           duration-500 flex flex-col justify-end p-6 sm:p-8"
+                           duration-500 flex flex-col justify-end p-5 sm:p-8"
               >
                 <h3
-                  className="text-lg sm:text-xl font-bold text-white tracking-wider 
+                  className="text-base sm:text-xl font-bold text-white tracking-wider 
                              uppercase mb-1 group-hover:text-accent transition-colors duration-300"
                 >
                   {collection.title}
                 </h3>
                 <div
                   className="h-[2px] w-6 bg-accent group-hover:w-12 transition-all 
-                             duration-500 ease-out mb-4"
+                             duration-500 ease-out mb-3 sm:mb-4"
                 ></div>
                 <span
                   className="inline-flex items-center text-xs font-semibold tracking-widest 

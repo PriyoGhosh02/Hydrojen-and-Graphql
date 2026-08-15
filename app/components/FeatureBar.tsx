@@ -156,16 +156,17 @@ export function FeatureBar() {
   ];
 
   return (
-    <section className="relative z-10 w-full bg-black text-white py-12 sm:py-16 border-t border-neutral-900 overflow-hidden">
+    <section className="relative z-10 w-full bg-black text-white py-8 sm:py-16 border-t border-neutral-900 overflow-hidden">
       <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-8 sm:gap-10 lg:gap-6 items-start justify-items-center">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-6 sm:gap-10 lg:gap-6 items-start justify-items-center">
           {features.map((item, index) => (
             <div
               key={index}
-              className="flex flex-col items-center text-center group cursor-default transition-transform duration-300 hover:-translate-y-1 w-full max-w-[200px]"
+              className={`flex flex-col items-center text-center group cursor-default transition-transform duration-300 hover:-translate-y-1 w-full max-w-[200px] ${index === 6 ? 'col-span-2 sm:col-span-1' : ''
+                }`}
             >
               {/* Icon Container */}
-              <div className="mb-4 transition-transform duration-300 group-hover:scale-110">
+              <div className="mb-3 sm:mb-4 transition-transform duration-300 group-hover:scale-110">
                 {item.icon}
               </div>
 

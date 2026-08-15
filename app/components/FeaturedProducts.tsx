@@ -64,10 +64,10 @@ function ProductCard({ product }: { product: any }) {
                 e.stopPropagation();
                 setCurrentImgIndex((prev) => (prev - 1 + displayImages.length) % displayImages.length);
               }}
-              className="absolute left-2 top-1/2 -translate-y-1/2 z-20 bg-white/90 hover:bg-white text-black w-8 h-8 rounded-none flex items-center justify-center shadow-md transition-all duration-300 opacity-0 group-hover:opacity-100 hover:scale-105"
+              className="absolute left-2 top-1/2 -translate-y-1/2 z-20 bg-white/90 hover:bg-white text-black w-7 h-7 sm:w-8 sm:h-8 rounded-none flex items-center justify-center shadow-md transition-all duration-300 opacity-70 sm:opacity-0 group-hover:opacity-100 hover:scale-105"
               aria-label="Previous image"
             >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             </button>
@@ -79,16 +79,16 @@ function ProductCard({ product }: { product: any }) {
                 e.stopPropagation();
                 setCurrentImgIndex((prev) => (prev + 1) % displayImages.length);
               }}
-              className="absolute right-2 top-1/2 -translate-y-1/2 z-20 bg-white/90 hover:bg-white text-black w-8 h-8 rounded-none flex items-center justify-center shadow-md transition-all duration-300 opacity-0 group-hover:opacity-100 hover:scale-105"
+              className="absolute right-2 top-1/2 -translate-y-1/2 z-20 bg-white/90 hover:bg-white text-black w-7 h-7 sm:w-8 sm:h-8 rounded-none flex items-center justify-center shadow-md transition-all duration-300 opacity-70 sm:opacity-0 group-hover:opacity-100 hover:scale-105"
               aria-label="Next image"
             >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </button>
 
             {/* Indicator Dots */}
-            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex gap-1.5 opacity-80 sm:opacity-0 group-hover:opacity-100 transition-opacity duration-300">
               {displayImages.map((_: any, idx: number) => (
                 <button
                   key={idx}
@@ -173,33 +173,37 @@ export function FeaturedProducts({ products }: { products: any[] }) {
       const section = sectionRef.current;
 
       if (track && section) {
-        // Measure horizontal overflow dynamically
-        const getScrollAmount = () => {
-          const overflow = track.scrollWidth - track.clientWidth;
-          return overflow > 0 ? -overflow : 0;
-        };
+        const mm = gsap.matchMedia();
 
-        gsap.to(track, {
-          x: getScrollAmount,
-          ease: 'none',
-          scrollTrigger: {
-            trigger: section,
-            start: 'top top',
-            end: () => `+=${Math.max(0, track.scrollWidth - track.clientWidth)}`,
-            pin: true,
-            pinSpacing: true,
-            scrub: 1,
-            invalidateOnRefresh: true,
-            onRefresh: (self) => {
-              const overflow = track.scrollWidth - track.clientWidth;
-              if (overflow <= 5) {
-                self.disable();
-                gsap.set(track, { x: 0 });
-              } else {
-                self.enable();
-              }
+        mm.add('(min-width: 768px)', () => {
+          // Measure horizontal overflow dynamically for desktop
+          const getScrollAmount = () => {
+            const overflow = track.scrollWidth - track.clientWidth;
+            return overflow > 0 ? -overflow : 0;
+          };
+
+          gsap.to(track, {
+            x: getScrollAmount,
+            ease: 'none',
+            scrollTrigger: {
+              trigger: section,
+              start: 'top top',
+              end: () => `+=${Math.max(0, track.scrollWidth - track.clientWidth)}`,
+              pin: true,
+              pinSpacing: true,
+              scrub: 1,
+              invalidateOnRefresh: true,
+              onRefresh: (self) => {
+                const overflow = track.scrollWidth - track.clientWidth;
+                if (overflow <= 5) {
+                  self.disable();
+                  gsap.set(track, { x: 0 });
+                } else {
+                  self.enable();
+                }
+              },
             },
-          },
+          });
         });
       }
     }, sectionRef);
@@ -209,7 +213,7 @@ export function FeaturedProducts({ products }: { products: any[] }) {
 
   if (!products || products.length === 0) {
     return (
-      <section className="py-20 px-4 text-center relative z-10 bg-white">
+      <section className="py-12 sm:py-20 px-4 text-center relative z-10 bg-white">
         <p className="text-gray-500">No products found</p>
       </section>
     );
@@ -218,32 +222,32 @@ export function FeaturedProducts({ products }: { products: any[] }) {
   return (
     <section
       ref={sectionRef}
-      className="relative z-10 bg-white py-20 min-h-screen flex flex-col justify-center overflow-hidden"
+      className="relative z-10 bg-white py-12 sm:py-20 min-h-0 md:min-h-screen flex flex-col justify-center overflow-hidden"
     >
       {/* Section Header */}
-      <div className="products-header max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 w-full text-center mb-16">
+      <div className="products-header max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 w-full text-center mb-8 sm:mb-16">
         <p
-          className="products-header-item text-accent text-sm font-medium tracking-[0.3em] 
-                      uppercase mb-3"
+          className="products-header-item text-accent text-xs sm:text-sm font-medium tracking-[0.25em] sm:tracking-[0.3em] 
+                      uppercase mb-2 sm:mb-3"
         >
           Curated For You
         </p>
-        <h2 className="products-header-item text-3xl sm:text-5xl font-normal text-primary">
+        <h2 className="products-header-item text-2xl sm:text-5xl font-normal text-primary">
           Trending Now
         </h2>
-        <div className="products-header-item w-20 h-0.5 bg-accent mx-auto mt-4"></div>
+        <div className="products-header-item w-16 sm:w-20 h-0.5 bg-accent mx-auto mt-3 sm:mt-4"></div>
       </div>
 
-      {/* Horizontal Products Grid Container */}
+      {/* Horizontal Products Grid / Snap-Scroll Container */}
       <div className="relative w-full max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 overflow-visible">
         <div
           ref={trackRef}
-          className="products-track flex flex-row flex-nowrap gap-6 sm:gap-8 w-full"
+          className="products-track flex flex-row flex-nowrap gap-4 sm:gap-8 w-full overflow-x-auto md:overflow-visible snap-x snap-mandatory pb-4 md:pb-0 scrollbar-none"
         >
           {products.map((product) => (
             <div
               key={product.id}
-              className="product-card-item shrink-0 w-[calc((100%-1.5rem)/2)] md:w-[calc((100%-3*1.5rem)/4)] lg:w-[calc((100%-3*2rem)/4)]"
+              className="product-card-item shrink-0 snap-start w-[72vw] sm:w-[calc((100%-1.5rem)/2)] md:w-[calc((100%-3*1.5rem)/4)] lg:w-[calc((100%-3*2rem)/4)]"
             >
               <ProductCard product={product} />
             </div>

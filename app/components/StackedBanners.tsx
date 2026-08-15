@@ -65,7 +65,9 @@ export function StackedBanners({ data }: StackedBannersProps) {
   useEffect(() => {
     const ctx = gsap.context(() => {
       // Calculate initial title height offset so Banner 1 sits right under the title initially
-      const titleHeight = titleRef.current ? titleRef.current.offsetHeight + 30 : 250;
+      const rawTitleHeight = titleRef.current ? titleRef.current.offsetHeight + 15 : 150;
+      const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
+      const titleHeight = isMobile ? Math.min(rawTitleHeight, 130) : rawTitleHeight;
 
       // Set initial positions:
       // Banner 1 sits right below the title so both are visible together on scroll-in
@@ -79,7 +81,7 @@ export function StackedBanners({ data }: StackedBannersProps) {
         scrollTrigger: {
           trigger: sectionRef.current,
           start: 'top top',
-          end: '+=300%',
+          end: isMobile ? '+=200%' : '+=300%',
           pin: true,
           pinSpacing: true,
           scrub: 1,
@@ -113,9 +115,9 @@ export function StackedBanners({ data }: StackedBannersProps) {
       {/* Main Title Section - Visible at top behind/above Banner 1 */}
       <div
         ref={titleRef}
-        className="title-area absolute top-0 inset-x-0 w-full flex justify-center max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-12 pb-4 z-0"
+        className="title-area absolute top-0 inset-x-0 w-full flex justify-center max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-12 pb-2 sm:pb-4 z-0"
       >
-        <h2 className="text-primary text-center text-4xl sm:text-6xl md:text-7xl lg:text-[80px] xl:text-[85px] font-normal tracking-tight leading-[1.05] max-w-6xl font-sans">
+        <h2 className="text-primary text-center text-2xl sm:text-5xl md:text-7xl lg:text-[80px] xl:text-[85px] font-normal tracking-tight leading-[1.1] sm:leading-[1.05] max-w-6xl font-sans">
           {mainTitle}
         </h2>
       </div>
@@ -142,14 +144,14 @@ export function StackedBanners({ data }: StackedBannersProps) {
             <div className="absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-black/90 via-black/40 to-transparent pointer-events-none" />
 
             {/* Banner Content: Title on Bottom-Left, Button on Bottom-Right */}
-            <div className="absolute inset-x-0 bottom-0 max-w-8xl mx-auto p-6 sm:p-10 lg:p-14 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6 z-10 w-full">
-              <h3 className="text-white text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight max-w-xl font-sans drop-shadow-md">
+            <div className="absolute inset-x-0 bottom-0 max-w-8xl mx-auto p-4 sm:p-10 lg:p-14 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-3 sm:gap-6 z-10 w-full">
+              <h3 className="text-white text-lg sm:text-3xl lg:text-4xl font-bold tracking-tight max-w-xl font-sans drop-shadow-md">
                 {banner.title}
               </h3>
 
               <Link
                 to={banner.link}
-                className="inline-flex items-center gap-3 bg-[#d4af37] hover:bg-white text-black font-bold uppercase tracking-widest text-xs sm:text-sm px-8 py-4 transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+                className="inline-flex items-center gap-2 sm:gap-3 bg-[#d4af37] hover:bg-white text-black font-bold uppercase tracking-widest text-xs sm:text-sm px-5 py-3 sm:px-8 sm:py-4 transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5"
               >
                 <span>Shop Now</span>
                 <svg

@@ -83,19 +83,19 @@ export function BrandShowcase({ data }: BrandShowcaseProps) {
 
   return (
     <section
-      className="relative z-10 w-full py-12 sm:py-16 overflow-hidden select-none bg-white"
+      className="relative z-10 w-full py-8 sm:py-16 overflow-hidden select-none bg-white border-b border-gray-100"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
       {/* Edge gradient fade masks for smooth entrance and exit */}
-      <div className="absolute left-0 top-0 bottom-0 w-16 sm:w-32 bg-gradient-to-r from-white to-transparent z-20 pointer-events-none" />
-      <div className="absolute right-0 top-0 bottom-0 w-16 sm:w-32 bg-gradient-to-l from-white to-transparent z-20 pointer-events-none" />
+      <div className="absolute left-0 top-0 bottom-0 w-8 sm:w-32 bg-gradient-to-r from-white to-transparent z-20 pointer-events-none" />
+      <div className="absolute right-0 top-0 bottom-0 w-8 sm:w-32 bg-gradient-to-l from-white to-transparent z-20 pointer-events-none" />
 
       {/* Marquee Track Container */}
       <div className="relative w-full overflow-hidden flex items-center">
         <div
           ref={trackRef}
-          className="flex flex-row flex-nowrap items-center gap-16 sm:gap-24 whitespace-nowrap will-change-transform"
+          className="flex flex-row flex-nowrap items-center gap-8 sm:gap-24 whitespace-nowrap will-change-transform"
         >
           {displayItems.map((item: string, idx: number) => {
             const isImage = typeof item === 'string' && (item.startsWith('http') || item.includes('/'));
@@ -103,17 +103,17 @@ export function BrandShowcase({ data }: BrandShowcaseProps) {
             return (
               <div
                 key={`${item}-${idx}`}
-                className="flex items-center justify-center shrink-0 h-14 sm:h-16 px-4 group cursor-pointer transition-transform duration-300 hover:scale-105"
+                className="flex items-center justify-center shrink-0 h-10 sm:h-16 px-2 sm:px-4 group cursor-pointer transition-transform duration-300 hover:scale-105"
               >
                 {isImage ? (
                   <img
                     src={item}
                     alt="Brand Logo"
-                    className="max-h-10 sm:max-h-12 w-auto object-contain opacity-80 group-hover:opacity-50 transition-all duration-300"
+                    className="max-h-7 sm:max-h-12 w-auto object-contain opacity-80 group-hover:opacity-50 transition-all duration-300"
                     draggable="false"
                   />
                 ) : (
-                  <span className="text-gray-400 group-hover:text-primary transition-colors duration-300 text-lg sm:text-xl font-bold tracking-[0.3em] uppercase font-sans">
+                  <span className="text-gray-400 group-hover:text-primary transition-colors duration-300 text-xs sm:text-xl font-bold tracking-[0.2em] sm:tracking-[0.3em] uppercase font-sans">
                     {item}
                   </span>
                 )}

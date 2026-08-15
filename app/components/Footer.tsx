@@ -46,10 +46,10 @@ export function Footer({
   };
 
   return (
-    <footer className="relative z-10 w-full bg-[#f6f6f6] text-primary border-t border-gray-200/80 pt-16 sm:pt-20 pb-12 font-sans select-none">
+    <footer className="relative z-10 w-full bg-[#f6f6f6] text-primary border-t border-gray-200/80 pt-12 sm:pt-20 pb-8 sm:pb-12 font-sans select-none">
       <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* 4-Column Desktop Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-12 pb-16 border-b border-gray-300/70">
+        {/* 4-Column Responsive Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10 lg:gap-12 pb-12 sm:pb-16 border-b border-gray-300/70">
           {/* Column 1: Brand Info & Social Icons */}
           <div className="flex flex-col items-start">
             <h3 className="text-3xl font-bold tracking-[0.2em] uppercase text-primary mb-4 font-sans">

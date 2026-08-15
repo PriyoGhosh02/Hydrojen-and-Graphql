@@ -2,6 +2,7 @@ import { useState, Suspense } from 'react';
 import { Link, useLocation, useRouteLoaderData, Await } from 'react-router';
 import type { RootLoader } from '~/root';
 import { openCartDrawer } from '~/components/CartDrawer';
+import { useAside } from '~/components/Aside';
 
 // Cart Icon Component
 function CartIcon({ count }: { count: number }) {
@@ -73,6 +74,7 @@ function parseMenuUrl(url: string, publicStoreDomain: string) {
 export function Header({ cartCount = 0 }: { cartCount?: number }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
+  const aside = useAside();
 
   const rootData = useRouteLoaderData<RootLoader>('root');
   const menu = rootData?.header?.menu;
@@ -170,9 +172,13 @@ export function Header({ cartCount = 0 }: { cartCount?: number }) {
           </nav>
 
           {/* Right Side Icons */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 sm:space-x-4">
             {/* Search Icon */}
-            <button className="p-2 hover:opacity-70 transition-opacity hidden md:block">
+            <button
+              onClick={() => aside.open('search')}
+              aria-label="Search"
+              className="p-2 hover:opacity-70 transition-opacity text-gray-700 hover:text-accent focus:outline-none cursor-pointer"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-5 w-5"
@@ -189,10 +195,11 @@ export function Header({ cartCount = 0 }: { cartCount?: number }) {
               </svg>
             </button>
 
-            {/* Account Icon */}
+            {/* Account Icon (Desktop only) */}
             <Link
               to="/account"
-              className="p-2 hover:opacity-70 transition-opacity hidden md:block"
+              aria-label="Account"
+              className="p-2 hover:opacity-70 transition-opacity text-gray-700 hover:text-accent hidden md:block"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -219,90 +226,130 @@ export function Header({ cartCount = 0 }: { cartCount?: number }) {
               </Await>
             </Suspense>
 
-            {/* Mobile Menu Button */}
+            {/* 3-Dot Mobile Menu Button */}
             <button
-              className="md:hidden p-2"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="md:hidden p-2 text-gray-700 hover:text-accent focus:outline-none"
+              onClick={() => setIsMenuOpen(true)}
+              aria-label="Open mobile menu"
             >
-              {isMenuOpen ? (
-                <svg
-                  className="h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1.5}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              ) : (
-                <svg
-                  className="h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1.5}
-                    d="M4 6h16M4 12h16M4 18h16"
-                  />
-                </svg>
-              )}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
+                />
+              </svg>
             </button>
           </div>
         </div>
 
-        {/* Mobile Menu */}
+        {/* Mobile Slide-Over Overlay Menu (Opens ABOVE main page) */}
         {isMenuOpen && (
-          <div className="md:hidden border-t border-gray-100 py-4">
-            <nav className="flex flex-col space-y-4">
-              {menuItems.map((item: any) => {
-                const url = parseMenuUrl(item.url, publicStoreDomain);
-                const hasChildren = item.items && item.items.length > 0;
+          <div className="fixed inset-0 z-50 md:hidden flex justify-end">
+            {/* Dark Backdrop Overlay */}
+            <div
+              className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
+              onClick={() => setIsMenuOpen(false)}
+              aria-hidden="true"
+            />
 
-                return (
-                  <div key={item.id} className="flex flex-col">
-                    {hasChildren ? (
-                      <>
-                        <span className="text-xs font-semibold tracking-wider text-gray-400 uppercase px-2 py-1">
-                          {item.title}
-                        </span>
-                        <div className="pl-4 flex flex-col space-y-3 mt-1">
-                          {item.items.map((child: any) => {
-                            const childUrl = parseMenuUrl(child.url, publicStoreDomain);
-                            return (
-                              <Link
-                                key={child.id}
-                                to={childUrl}
-                                onClick={() => setIsMenuOpen(false)}
-                                className={`text-xs font-medium tracking-wide uppercase px-2 py-1 transition-colors hover:text-accent
-                                           ${location.pathname === childUrl ? 'text-accent' : 'text-gray-600'}`}
-                              >
-                                {child.title}
-                              </Link>
-                            );
-                          })}
-                        </div>
-                      </>
-                    ) : (
-                      <Link
-                        to={url}
-                        onClick={() => setIsMenuOpen(false)}
-                        className={`text-sm font-medium tracking-wide uppercase px-2 py-1 transition-colors hover:text-accent
-                                   ${location.pathname === url ? 'text-accent' : 'text-gray-600'}`}
-                      >
-                        {item.title}
-                      </Link>
-                    )}
-                  </div>
-                );
-              })}
-            </nav>
+            {/* Side Drawer Panel */}
+            <div className="relative w-4/5 max-w-xs h-full bg-white shadow-2xl flex flex-col justify-between z-10 overflow-y-auto">
+              <div>
+                {/* Drawer Header */}
+                <div className="flex items-center justify-between p-5 border-b border-gray-100">
+                  <span className="text-sm font-bold tracking-widest uppercase text-primary font-sans">
+                    Menu
+                  </span>
+                  <button
+                    onClick={() => setIsMenuOpen(false)}
+                    className="p-2 text-gray-500 hover:text-black focus:outline-none"
+                    aria-label="Close menu"
+                  >
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+
+                {/* Drawer Navigation Links */}
+                <nav className="p-5 flex flex-col space-y-4">
+                  {menuItems.map((item: any) => {
+                    const url = parseMenuUrl(item.url, publicStoreDomain);
+                    const hasChildren = item.items && item.items.length > 0;
+
+                    return (
+                      <div key={item.id} className="flex flex-col">
+                        {hasChildren ? (
+                          <>
+                            <span className="text-xs font-semibold tracking-wider text-gray-400 uppercase py-1">
+                              {item.title}
+                            </span>
+                            <div className="pl-3 flex flex-col space-y-2.5 mt-1 border-l-2 border-accent/30">
+                              {item.items.map((child: any) => {
+                                const childUrl = parseMenuUrl(child.url, publicStoreDomain);
+                                return (
+                                  <Link
+                                    key={child.id}
+                                    to={childUrl}
+                                    onClick={() => setIsMenuOpen(false)}
+                                    className={`text-xs font-medium tracking-wide uppercase py-1 transition-colors hover:text-accent
+                                               ${location.pathname === childUrl ? 'text-accent font-semibold' : 'text-gray-700'}`}
+                                  >
+                                    {child.title}
+                                  </Link>
+                                );
+                              })}
+                            </div>
+                          </>
+                        ) : (
+                          <Link
+                            to={url}
+                            onClick={() => setIsMenuOpen(false)}
+                            className={`text-sm font-medium tracking-wide uppercase py-1.5 transition-colors hover:text-accent
+                                       ${location.pathname === url ? 'text-accent font-semibold' : 'text-gray-800'}`}
+                          >
+                            {item.title}
+                          </Link>
+                        )}
+                      </div>
+                    );
+                  })}
+                </nav>
+              </div>
+
+              {/* Drawer Bottom Section: Account Link moved below menu items */}
+              <div className="p-5 border-t border-gray-100 bg-gray-50/70">
+                <Link
+                  to="/account"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="flex items-center gap-3 text-sm font-medium uppercase tracking-wider text-primary hover:text-accent py-2 transition-colors"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5 text-accent"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.5}
+                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                    />
+                  </svg>
+                  <span>Account</span>
+                </Link>
+              </div>
+            </div>
           </div>
         )}
       </div>

@@ -32,7 +32,11 @@ export const meta: Route.MetaFunction = () => {
 };
 
 export async function loader({context}: Route.LoaderArgs) {
-  await context.customerAccount.handleAuthStatus();
+  try {
+    await context.customerAccount.handleAuthStatus();
+  } catch (err) {
+    console.warn('Customer handleAuthStatus notice:', err);
+  }
 
   return {};
 }
@@ -258,7 +262,8 @@ export async function action({request, context}: Route.ActionArgs) {
 
 export default function Addresses() {
   const {customer} = useOutletContext<{customer: CustomerFragment}>();
-  const {defaultAddress, addresses} = customer;
+  const defaultAddress = customer?.defaultAddress ?? null;
+  const addresses = customer?.addresses ?? { nodes: [] };
 
   return (
     <div className="account-addresses">

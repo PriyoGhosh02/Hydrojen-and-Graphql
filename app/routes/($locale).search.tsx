@@ -41,30 +41,48 @@ export default function SearchPage() {
   if (type === 'predictive') return null;
 
   return (
-    <div className="search">
-      <h1>Search</h1>
-      <SearchForm>
-        {({inputRef}) => (
-          <>
-            <input
-              defaultValue={term}
-              name="q"
-              placeholder="Search…"
-              ref={inputRef}
-              type="search"
-            />
-            &nbsp;
-            <button type="submit">Search</button>
-          </>
-        )}
-      </SearchForm>
-      {error && <p style={{color: 'red'}}>{error}</p>}
+    <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 font-sans">
+      <div className="text-center max-w-xl mx-auto mb-12">
+        <p className="text-accent text-xs font-semibold tracking-[0.25em] uppercase mb-2">
+          Catalog Search
+        </p>
+        <h1 className="text-3xl sm:text-4xl font-normal text-primary tracking-tight mb-8">
+          Search Products &amp; Collections
+        </h1>
+        <SearchForm>
+          {({inputRef}) => (
+            <div className="flex flex-col sm:flex-row items-center gap-3">
+              <input
+                defaultValue={term}
+                name="q"
+                placeholder="Search by brand, category, or watch style..."
+                ref={inputRef}
+                type="search"
+                className="w-full px-5 py-3.5 bg-gray-50 border border-gray-200 text-sm sm:text-base font-light text-primary placeholder-gray-400 focus:outline-none focus:border-accent"
+              />
+              <button
+                type="submit"
+                className="w-full sm:w-auto bg-primary hover:bg-[#d4af37] text-white hover:text-black px-8 py-3.5 text-xs sm:text-sm font-bold uppercase tracking-widest transition-all duration-300 shadow-sm shrink-0 cursor-pointer"
+              >
+                Search
+              </button>
+            </div>
+          )}
+        </SearchForm>
+      </div>
+
+      {error && (
+        <div className="p-4 bg-red-50 border border-red-200 text-red-700 text-sm text-center mb-8 rounded">
+          {error}
+        </div>
+      )}
+
       {!term || !result?.total ? (
         <SearchResults.Empty />
       ) : (
         <SearchResults result={result} term={term}>
           {({articles, pages, products, term}) => (
-            <div>
+            <div className="space-y-12">
               <SearchResults.Products products={products} term={term} />
               <SearchResults.Pages pages={pages} term={term} />
               <SearchResults.Articles articles={articles} term={term} />

@@ -101,24 +101,24 @@ function SlideContent({
       </div>
 
       {/* Content */}
-      <div className="relative z-10 max-w-8xl mx-auto px-6 sm:px-8 lg:px-12 w-full h-full flex items-center">
-        <div className="max-w-2xl text-left">
+      <div className="relative z-10 max-w-8xl mx-auto px-5 sm:px-8 lg:px-12 w-full h-full flex items-center">
+        <div className="max-w-2xl text-left py-12 sm:py-0">
           {/* Subtitle */}
-          <p className="subtitle-item animate-item text-[#d4af37] text-xs sm:text-sm font-semibold tracking-[0.4em] uppercase mb-5">
+          <p className="subtitle-item animate-item text-[#d4af37] text-[11px] sm:text-sm font-semibold tracking-[0.25em] sm:tracking-[0.4em] uppercase mb-3 sm:mb-5">
             {collection?.title || (slide.title !== 'NEVER HUNT ALONE' ? 'Curated Range' : 'Premium Brand')}
           </p>
 
           {/* Title */}
-          <h1 className="text-white text-5xl sm:text-7xl lg:text-8xl font-normal leading-none tracking-tight mb-8 font-sans">
+          <h1 className="text-white text-3xl sm:text-6xl lg:text-8xl font-normal leading-tight sm:leading-none tracking-tight mb-4 sm:mb-8 font-sans">
             {mainWords.map((word: string, i: number) => (
-              <span key={i} className="title-word inline-block mr-3 sm:mr-4">
+              <span key={i} className="title-word inline-block mr-2 sm:mr-4">
                 {word}
               </span>
             ))}
             {lastWord && (
               <>
-                <br />
-                <span className="title-word text-[#d4af37] drop-shadow-lg inline-block mt-2">
+                <br className="hidden sm:block" />
+                <span className="title-word text-[#d4af37] drop-shadow-lg inline-block mt-1 sm:mt-2 ml-2 sm:ml-0">
                   {lastWord}
                 </span>
               </>
@@ -126,19 +126,19 @@ function SlideContent({
           </h1>
 
           {/* Description */}
-          <p className="desc-item animate-item text-gray-300 text-base sm:text-lg mb-10 max-w-lg leading-relaxed font-light">
+          <p className="desc-item animate-item text-gray-300 text-sm sm:text-lg mb-6 sm:mb-10 max-w-lg leading-relaxed font-light line-clamp-3 sm:line-clamp-none">
             {slide.desc}
           </p>
 
           {/* Buttons */}
-          <div className="flex flex-wrap gap-5">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-5 w-full sm:w-auto">
             <Link
               to={slide.btnUrl}
               draggable="false"
-              className="btn-item animate-item relative overflow-hidden group bg-[#d4af37] text-black px-10 py-4 text-xs sm:text-sm 
-                         font-bold tracking-widest uppercase transition-all duration-300 rounded-none
+              className="btn-item animate-item relative overflow-hidden group bg-[#d4af37] text-black px-6 py-3.5 sm:px-10 sm:py-4 text-xs sm:text-sm 
+                         font-bold tracking-widest uppercase transition-all duration-300 rounded-none text-center justify-center
                          shadow-[0_4px_20px_rgba(212,175,55,0.25)] hover:shadow-[0_6px_30px_rgba(212,175,55,0.4)]
-                         hover:-translate-y-0.5"
+                         hover:-translate-y-0.5 w-full sm:w-auto"
             >
               <span className="relative z-10">{slide.btnText}</span>
               <span className="absolute inset-0 w-full h-full bg-white scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300 ease-out -z-1 opacity-10"></span>
@@ -147,9 +147,9 @@ function SlideContent({
             <Link
               to="/collections/all"
               draggable="false"
-              className="btn-item animate-item relative overflow-hidden group border-2 border-white/80 text-white px-10 py-4 text-xs sm:text-sm 
-                         font-bold tracking-widest uppercase transition-all duration-300 rounded-none
-                         hover:border-white hover:-translate-y-0.5"
+              className="btn-item animate-item relative overflow-hidden group border-2 border-white/80 text-white px-6 py-3.5 sm:px-10 sm:py-4 text-xs sm:text-sm 
+                         font-bold tracking-widest uppercase transition-all duration-300 rounded-none text-center justify-center
+                         hover:border-white hover:-translate-y-0.5 w-full sm:w-auto"
             >
               <span className="relative z-10">All Products</span>
               <span className="absolute inset-0 w-full h-full bg-white scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300 ease-out -z-1 opacity-10"></span>
@@ -351,7 +351,7 @@ export function HeroSection({
   ];
 
   return (
-    <section ref={heroRef} className="hero-section sticky top-0 w-full h-[95vh] bg-[#121212] overflow-hidden flex items-center z-0 select-none">
+    <section ref={heroRef} className="hero-section relative sm:sticky top-0 w-full h-[85vh] min-h-[480px] sm:h-[95vh] bg-[#121212] overflow-hidden flex items-center z-0 select-none">
       <div className="hero-slide-wrapper w-full h-full relative overflow-hidden">
         {/* Sliding Track */}
         <div
@@ -388,12 +388,12 @@ export function HeroSection({
 
         {/* Dots Navigation */}
         {activeSlides.length > 1 && (
-          <div className="absolute bottom-10 left-10 z-20 flex gap-3">
+          <div className="absolute bottom-5 sm:bottom-10 left-1/2 -translate-x-1/2 sm:left-10 sm:translate-x-0 z-20 flex gap-2 sm:gap-3">
             {activeSlides.map((_, idx) => (
               <button
                 key={idx}
                 onClick={() => goToSlide(idx)}
-                className={`w-12 h-1.5 transition-all duration-500 rounded-none ${idx === currentIndex ? 'bg-[#d4af37]' : 'bg-white/30 hover:bg-white/60'
+                className={`w-8 sm:w-12 h-1 sm:h-1.5 transition-all duration-500 rounded-none ${idx === currentIndex ? 'bg-[#d4af37]' : 'bg-white/30 hover:bg-white/60'
                   }`}
                 aria-label={`Go to slide ${idx + 1}`}
               />
@@ -403,7 +403,7 @@ export function HeroSection({
 
         {/* Navigation Arrows */}
         {activeSlides.length > 1 && (
-          <div className="absolute right-10 bottom-8 z-20 flex gap-4">
+          <div className="absolute right-10 bottom-8 z-20 hidden sm:flex gap-4">
             <button
               onClick={prevSlide}
               className="w-12 h-12 flex items-center justify-center border border-white/30 text-white hover:bg-white/10 hover:border-white transition-all duration-300"

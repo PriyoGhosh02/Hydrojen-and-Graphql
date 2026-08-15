@@ -22,6 +22,7 @@ import favicon from '~/assets/fav.png';
 import { Header } from '~/components/Header';
 import { Footer } from '~/components/Footer';
 import { FOOTER_QUERY, HEADER_QUERY } from '~/lib/fragments';
+import { SearchAside } from '~/components/PageLayout';
 import type { Route } from './+types/root';
 // ❌ PageLayout remove করো
 // import {PageLayout} from './components/PageLayout';
@@ -114,11 +115,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         <Aside.Provider>
-          {/* ✅ শুধু আমাদের custom Header */}
+          {/* ✅ Header, Search Drawer & Cart Drawer */}
           <Header />
+          <SearchAside />
           <CartDrawer />
 
-          {/* ✅ Page content এখানে আসবে */}
+          {/* ✅ Page content */}
           <main>{children}</main>
         </Aside.Provider>
 

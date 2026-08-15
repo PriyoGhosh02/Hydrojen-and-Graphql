@@ -72,41 +72,41 @@ export function ImageWithText({ data }: ImageWithTextProps) {
   return (
     <section
       ref={sectionRef}
-      className="relative z-10 w-full bg-white min-h-screen flex items-center overflow-hidden"
+      className="relative z-10 w-full bg-white min-h-0 md:min-h-screen flex items-center overflow-hidden py-10 sm:py-16"
     >
-      <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 w-full py-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 lg:gap-24 w-full items-center">
+      <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 lg:gap-24 w-full items-center">
           {/* Left Side Content */}
-          <div className="relative w-full min-h-[350px] sm:min-h-[400px] flex flex-col justify-center order-2 md:order-1">
+          <div className="relative w-full min-h-[240px] sm:min-h-[360px] md:min-h-[420px] flex flex-col justify-center order-2 md:order-1">
             {/* Content Set 1 */}
             <div className="anim-content-1 absolute inset-0 w-full flex flex-col justify-center">
-              <p className="text-accent text-sm font-semibold tracking-[0.3em] uppercase mb-4">
+              <p className="text-accent text-xs sm:text-sm font-semibold tracking-[0.25em] sm:tracking-[0.3em] uppercase mb-2 sm:mb-4">
                 Timeless Gold
               </p>
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-normal text-primary mb-6 leading-tight font-sans">
+              <h2 className="text-2xl sm:text-4xl lg:text-5xl font-normal text-primary mb-3 sm:mb-6 leading-tight font-sans">
                 {data.title_1?.value || 'Timeless Gold, Effortless Elegance'}
               </h2>
-              <p className="text-gray-500 text-sm sm:text-base leading-relaxed font-light">
+              <p className="text-gray-500 text-xs sm:text-base leading-relaxed font-light line-clamp-4 sm:line-clamp-none">
                 {data.desc_1?.value}
               </p>
             </div>
 
             {/* Content Set 2 */}
             <div className="anim-content-2 absolute inset-0 w-full flex flex-col justify-center opacity-0 pointer-events-none">
-              <p className="text-accent text-sm font-semibold tracking-[0.3em] uppercase mb-4">
+              <p className="text-accent text-xs sm:text-sm font-semibold tracking-[0.25em] sm:tracking-[0.3em] uppercase mb-2 sm:mb-4">
                 Precision Craft
               </p>
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-normal text-primary mb-6 leading-tight font-sans">
+              <h2 className="text-2xl sm:text-4xl lg:text-5xl font-normal text-primary mb-3 sm:mb-6 leading-tight font-sans">
                 {data.title_2?.value || 'Precision Meets Timeless Style'}
               </h2>
-              <p className="text-gray-500 text-base sm:text-base leading-relaxed font-light">
+              <p className="text-gray-500 text-xs sm:text-base leading-relaxed font-light line-clamp-4 sm:line-clamp-none">
                 {data.desc_2?.value}
               </p>
             </div>
           </div>
 
-          {/* Right Side Image Container (95vh height on desktop, 60vh on mobile) */}
-          <div className="relative w-full h-[60vh] md:h-[95vh] overflow-hidden bg-gray-50 border border-gray-100 shadow-sm order-1 md:order-2">
+          {/* Right Side Image Container (95vh height on desktop, 45vh on mobile) */}
+          <div className="relative w-full h-[45vh] sm:h-[60vh] md:h-[95vh] min-h-[260px] sm:min-h-[380px] overflow-hidden bg-gray-50 border border-gray-100 shadow-sm order-1 md:order-2">
             {/* Image 1 */}
             {data.image_1?.value && (
               <img

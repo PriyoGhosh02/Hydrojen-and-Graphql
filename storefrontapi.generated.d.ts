@@ -608,6 +608,30 @@ export type ImageWithTextQuery = {
   >;
 };
 
+export type BrandShowcaseQueryVariables = StorefrontAPI.Exact<{
+  [key: string]: never;
+}>;
+
+export type BrandShowcaseQuery = {
+  metaobject?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.Metaobject, 'id'> & {
+      fields: Array<Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>>;
+    }
+  >;
+};
+
+export type StackedBannersQueryVariables = StorefrontAPI.Exact<{
+  [key: string]: never;
+}>;
+
+export type StackedBannersQuery = {
+  metaobject?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.Metaobject, 'id'> & {
+      fields: Array<Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>>;
+    }
+  >;
+};
+
 export type ArticleQueryVariables = StorefrontAPI.Exact<{
   articleHandle: StorefrontAPI.Scalars['String']['input'];
   blogHandle: StorefrontAPI.Scalars['String']['input'];
@@ -1479,6 +1503,14 @@ interface GeneratedQueryTypes {
   '#graphql\n  query ImageWithText {\n    metaobject(handle: {handle: "image-with-text", type: "image_with_text"}) {\n      id\n      image_1: field(key: "image_1") { value }\n      title_1: field(key: "title_1") { value }\n      desc_1: field(key: "desc_1") { value }\n      image_2: field(key: "image_2") { value }\n      title_2: field(key: "title_2") { value }\n      desc_2: field(key: "desc_2") { value }\n    }\n  }\n': {
     return: ImageWithTextQuery;
     variables: ImageWithTextQueryVariables;
+  };
+  '#graphql\n  query BrandShowcase {\n    metaobject(handle: {handle: "brand-img", type: "brand"}) {\n      id\n      fields {\n        key\n        value\n      }\n    }\n  }\n': {
+    return: BrandShowcaseQuery;
+    variables: BrandShowcaseQueryVariables;
+  };
+  '#graphql\n  query StackedBanners {\n    metaobject(handle: {handle: "banner-3", type: "3_banner"}) {\n      id\n      fields {\n        key\n        value\n      }\n    }\n  }\n': {
+    return: StackedBannersQuery;
+    variables: StackedBannersQueryVariables;
   };
   '#graphql\n  query Article(\n    $articleHandle: String!\n    $blogHandle: String!\n    $country: CountryCode\n    $language: LanguageCode\n  ) @inContext(language: $language, country: $country) {\n    blog(handle: $blogHandle) {\n      handle\n      articleByHandle(handle: $articleHandle) {\n        handle\n        title\n        contentHtml\n        publishedAt\n        author: authorV2 {\n          name\n        }\n        image {\n          id\n          altText\n          url\n          width\n          height\n        }\n        seo {\n          description\n          title\n        }\n      }\n    }\n  }\n': {
     return: ArticleQuery;
