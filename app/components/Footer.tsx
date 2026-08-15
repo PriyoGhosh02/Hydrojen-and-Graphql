@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { NavLink } from 'react-router';
+import { useState, useEffect } from 'react';
+import { NavLink, useFetcher } from 'react-router';
 import type { FooterQuery, HeaderQuery } from 'storefrontapi.generated';
 
 interface FooterProps {
@@ -13,19 +13,46 @@ export function Footer({
   header,
   publicStoreDomain = '',
 }: FooterProps) {
+  const fetcher = useFetcher<any>();
   const [email, setEmail] = useState('');
-  const [subscribed, setSubscribed] = useState(false);
+  const [subscribedEmail, setSubscribedEmail] = useState<string | null>(null);
+
+  // Restore subscription status from localStorage on mount
+  useEffect(() => {
+    try {
+      const savedEmail = localStorage.getItem('timecrafts_subscriber_email');
+      if (savedEmail) {
+        setSubscribedEmail(savedEmail);
+      }
+    } catch {
+      // localStorage unavailable in SSR
+    }
+  }, []);
+
+  // Sync fetcher response success with subscribed email state
+  useEffect(() => {
+    if (fetcher.data?.success && fetcher.data?.email) {
+      setSubscribedEmail(fetcher.data.email);
+      setEmail('');
+      try {
+        localStorage.setItem('timecrafts_subscriber_email', fetcher.data.email);
+      } catch {
+        // ignore
+      }
+    }
+  }, [fetcher.data]);
 
   const mainMenu = header?.menu?.items || FALLBACK_MAIN_MENU;
   const footerMenu = footer?.menu?.items || FALLBACK_FOOTER_MENU;
   const brandName = header?.shop?.name || 'TIMECRAFTS';
   const primaryDomainUrl = header?.shop?.primaryDomain?.url || '';
 
-  const handleSubscribe = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (email.trim()) {
-      setSubscribed(true);
-      setEmail('');
+  const handleUnsubscribe = () => {
+    setSubscribedEmail(null);
+    try {
+      localStorage.removeItem('timecrafts_subscriber_email');
+    } catch {
+      // ignore
     }
   };
 
@@ -44,6 +71,10 @@ export function Footer({
     }
     return url;
   };
+
+  const isSubmitting = fetcher.state !== 'idle';
+  const serverMessage = fetcher.data?.message;
+  const serverError = fetcher.data?.error;
 
   return (
     <footer className="relative z-10 w-full bg-[#f6f6f6] text-primary border-t border-gray-200/80 pt-12 sm:pt-20 pb-8 sm:pb-12 font-sans select-none">
@@ -116,7 +147,7 @@ export function Footer({
             </div>
           </div>
 
-          {/* Column 2: Main Menu (Handle: main-menu-hydro) */}
+          {/* Column 2: Main Menu */}
           <div>
             <h4 className="text-sm font-semibold uppercase tracking-[0.25em] text-primary mb-5">
               Explore
@@ -152,7 +183,7 @@ export function Footer({
             </ul>
           </div>
 
-          {/* Column 3: Footer Menu (Handle: footer) */}
+          {/* Column 3: Footer Menu */}
           <div>
             <h4 className="text-sm font-semibold uppercase tracking-[0.25em] text-primary mb-5">
               Information
@@ -188,7 +219,7 @@ export function Footer({
             </ul>
           </div>
 
-          {/* Column 4: Newsletter */}
+          {/* Column 4: Newsletter (Backend Subscription via /api/subscribe) */}
           <div>
             <h4 className="text-sm font-semibold uppercase tracking-[0.25em] text-primary mb-5">
               Newsletter
@@ -197,27 +228,44 @@ export function Footer({
               Subscribe for exclusive access to curated drops, private horology events, and seasonal offers.
             </p>
 
-            {subscribed ? (
-              <div className="p-4 bg-white border border-accent/40 text-xs text-primary font-medium">
-                Thank you for subscribing to our private list.
+            {subscribedEmail ? (
+              <div className="p-4 bg-white border border-[#d4af37] text-xs text-primary space-y-2 shadow-2xs">
+                <div className="flex items-center gap-2 font-bold uppercase tracking-wider text-[#d4af37]">
+                  <span>✓ Registered in Customer Base</span>
+                </div>
+                <p className="text-[11px] text-gray-600 font-light leading-relaxed">
+                  {serverMessage || `Welcome! ${subscribedEmail} is subscribed to the backend customer database.`}
+                </p>
+                <button
+                  type="button"
+                  onClick={handleUnsubscribe}
+                  className="text-[10px] text-gray-400 hover:text-black underline cursor-pointer pt-1 block"
+                >
+                  Subscribe a different email
+                </button>
               </div>
             ) : (
-              <form onSubmit={handleSubscribe} className="flex flex-col gap-2.5">
+              <fetcher.Form method="post" action="/api/subscribe" className="flex flex-col gap-2.5">
                 <input
                   type="email"
+                  name="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email address"
                   className="w-full px-4 py-3 bg-white border border-gray-300 text-sm font-light text-primary placeholder-gray-400 focus:outline-none focus:border-primary transition-colors"
                 />
+                {serverError && (
+                  <p className="text-xs text-red-600 font-light">{serverError}</p>
+                )}
                 <button
                   type="submit"
-                  className="w-full bg-primary hover:bg-[#d4af37] text-white hover:text-black text-xs font-bold uppercase tracking-widest py-3 px-6 transition-all duration-300 shadow-sm cursor-pointer"
+                  disabled={isSubmitting}
+                  className="w-full bg-primary hover:bg-[#d4af37] text-white hover:text-black text-xs font-bold uppercase tracking-widest py-3 px-6 transition-all duration-300 shadow-sm cursor-pointer disabled:bg-gray-300 disabled:cursor-not-allowed"
                 >
-                  Subscribe
+                  {isSubmitting ? 'Subscribing to Backend...' : 'Subscribe'}
                 </button>
-              </form>
+              </fetcher.Form>
             )}
           </div>
         </div>
@@ -234,9 +282,11 @@ export function Footer({
 
 const FALLBACK_MAIN_MENU = [
   { id: '1', title: 'Home', url: '/' },
-  { id: '2', title: 'Watch', url: '/collections/watch-1' },
-  { id: '3', title: 'Bracelet', url: '/collections/bracelet-1' },
-  { id: '4', title: 'Contact', url: '/pages/contact' },
+  { id: '2', title: 'Collections', url: '/collections' },
+  { id: '3', title: 'Watch', url: '/collections/watch-1' },
+  { id: '4', title: 'Bracelet', url: '/collections/bracelet-1' },
+  { id: '5', title: 'About', url: '/about' },
+  { id: '6', title: 'Contact', url: '/contact' },
 ];
 
 const FALLBACK_FOOTER_MENU = [
